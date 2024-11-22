@@ -1,0 +1,438 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS for Poppins Font */
+.font-poppins {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Sidebar Styles */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.wrapper {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 200px;
+    background: #FFF;
+    box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.15);
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Sidebar Logo */
+.logo {
+    margin: 0 15px 5px 15px;
+    padding-top: 30px;
+}
+
+/* Sidebar Divider */
+.divider {
+    width: 80%;
+    height: 0.1px;
+    background: #98A2B3;
+    margin: 15px 15px;
+}
+
+/* Sidebar Profile Section */
+.profile {
+    display: flex;
+    align-items: center;
+    margin: 0px 15px;
+}
+
+.profile-photo {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-name {
+    color: #000;
+    font-family: Poppins;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.profile-role {
+    color: #121212;
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+/* Sidebar Menu */
+.menu {
+    margin: 10px 0 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    width: 100%;
+}
+
+.menu-item:hover,
+.menu-item.active {
+    background-color: #B2C7F0;
+}
+
+.menu-item:hover .menu-text,
+.menu-item.active .menu-text {
+    color: #021A48;
+}
+
+.menu-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.menu-text {
+    color: #021A48;
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Sidebar Settings */
+.settings {
+    margin-top: auto;
+    margin-bottom: 44px;
+    padding: 10px 15px;
+}
+
+.settings-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: #000;
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.settings-item#item-logout {
+    color: #E30000;
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.settings-icon {
+    width: 16px;
+    height: 16px;
+
+}
+
+
+
+
+
+
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    margin-left: 100px;
+    padding: 20px;
+}
+
+/* Heading Style */
+.heading {
+    color: #000;
+    font-family: Poppins, sans-serif;
+    font-size: 31px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 120%;
+    margin-top: 30px;
+}
+
+
+
+/* Stats Container */
+.stats {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 13px;
+    padding: 5px;
+    margin-top: -20px;
+
+}
+
+/* Stat Card */
+.stat-card {
+    display: flex;
+    padding: 12px;
+    align-items: center;
+    gap: 16px;
+    border-radius: 8px;
+    background: #FCFCFD;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+    flex: 0 0 auto;
+    min-width: 200px;
+}
+
+/* Stat Icon */
+.stat-icon {
+    width: 32px;
+    height: 32px;
+}
+
+/* Stat Text */
+.stat-text {
+    color: #434343;
+    font-family: Poppins, sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 120%;
+}
+
+/* Stat Number */
+.stat-number {
+    color: #434343;
+    font-family: Poppins, sans-serif;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 120%;
+}
+
+
+
+
+
+
+
+
+
+.stat-section {
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.stat-title-dropdown {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stat-title {
+    color: #000;
+    font-family: Poppins, sans-serif;
+    font-size: 25px;
+    font-weight: 400;
+    line-height: 30px;
+}
+
+.sort-by-dropdown {
+    display: flex;
+    align-items: center;
+    font-family: Poppins, sans-serif;
+}
+
+.dd-title {
+    margin-right: 10px;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.sort-by-dropdown select {
+    padding: 10px 30px;
+    font-size: 14px;
+    border: 1px solid #EAECF0;
+    border-radius: 6.74px;
+    font-family: Poppins, sans-serif;
+}
+
+.stat-chart {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.stacked-chart, .chart-donut {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 13.481px;
+    border-radius: 6.74px;
+    border: 0.562px solid #EAECF0;
+    background: #FFF;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+    padding: 20px;
+    font-family: Poppins, sans-serif;
+}
+
+.stacked-chart h3, .chart-donut h3 {
+    margin-bottom: 15px;
+    font-family: Poppins, sans-serif;
+}
+
+
+
+
+
+
+
+
+/* leads-head */
+.leads-head h2 {
+    color: #000;
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 28.8px;
+}
+
+.leads-head a {
+    color: #316CEC;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 20px;
+    text-decoration: underline;
+}
+
+/* tabel-leads */
+.tabel-leads {
+    display: flex;
+    padding: 15.502px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7.751px;
+    align-self: stretch;
+    border: 1px solid #EAECF0;
+    border-radius: 12px;
+}
+
+/* Table Header */
+table th {
+    color: #000;
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.638px;
+    font-weight: 700;
+    line-height: 15.957px;
+    background-color: #F2F4F7;
+}
+
+/* Table Body */
+table td {
+    color: #1D2939;
+    font-family: 'Poppins', sans-serif;
+    font-size: 9.308px;
+    font-weight: 400;
+    line-height: 13.962px;
+}
+
+/* Border for rows */
+table tr {
+    border-bottom: 1px solid #D0D5DD;
+}
+
+/* Action Buttons */
+.table-actions a,
+.table-actions button {
+    display: flex;
+    width: 25.965px;
+    height: 25.965px;
+    padding: 6.491px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5.193px;
+}
+
+.table-actions .edit-button {
+    background: #EFF4FF;
+}
+
+.table-actions .delete-button {
+    background: #FEF3F2;
+}
+
+::placeholder {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400; /* Normal weight */
+}
+
+
+
+#file-upload {
+    display: none;
+}
+
+.upload-file {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    height: 224px;
+    padding: 16px 32px;
+    border-radius: 8px;
+    border: 2px solid #767676;
+}
+
+#file-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f1f1f1;
+    margin-bottom: 8px;
+}
+
+
+
+.pagination-button {
+    display: flex;
+    width: 37.838px;
+    height: 37.838px;
+    padding: 7.568px 11.351px;
+    justify-content: center;
+    align-items: center;
+    gap: 3.784px;
+    border-radius: 50%; /* Bulat */
+    background: var(--tertiary-300, #D0D5DD);
+    cursor: pointer; /* Menunjukkan bahwa tombol bisa diklik */
+    border: none; /* Menghapus border default */
+}
+
+.pagination-button.active {
+    background: var(--Foundation-Blue-Normal, #0549CF); /* Untuk halaman aktif */
+    color: white; /* Warna teks halaman aktif */
+}
+
+.pagination-button.inactive {
+    background: transparent; /* Untuk halaman tidak aktif */
+    color: black; /* Warna teks halaman tidak aktif */
+}

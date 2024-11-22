@@ -1,0 +1,20 @@
+cara isa masuk phpMyAdmin
+
+harus pakai password
+
+di config.inc.php
+/* Authentication type and info */
+$cfg['Servers'][$i]['auth_type'] = 'config';
+$cfg['Servers'][$i]['user'] = 'root';
+$cfg['Servers'][$i]['password'] = 'rora12';
+$cfg['Servers'][$i]['extension'] = 'mysqli';
+$cfg['Servers'][$i]['AllowNoPassword'] = false;
+$cfg['Lang'] = '';
+
+di MySQL lewat cmd
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'rora12';
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> FLUSH PRIVILEGES;
+
+saat php artisan migrate dan eror, aku ganti db host ke localhost, bukan 127.0.0.1
