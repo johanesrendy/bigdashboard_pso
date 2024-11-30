@@ -30,8 +30,8 @@ jobs:
     - name: Ensure SQLite Database Exists
       run: |
         sudo mkdir -p /var/www/laravel/database
-        touch /var/www/laravel/database/database.sqlite
-        chmod -R 777 /var/www/laravel/database
+        sudo touch /var/www/laravel/database/database.sqlite
+        sudo chmod -R 777 /var/www/laravel/database
 
     # Install Composer dependencies
     - name: Install Dependencies
