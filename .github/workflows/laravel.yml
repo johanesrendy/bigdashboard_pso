@@ -8,51 +8,49 @@ on:
 
 jobs:
   laravel-tests-and-deploy:
-
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout repository
     - uses: actions/checkout@v4
 
-    # Set up PHP (PHP 8.2)
+    # Step to set up PHP
     - name: Set up PHP
       uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
       with:
         php-version: '8.2'
 
-    # Check Current Directory
     - name: Check Current Directory
       run: pwd
 
-    # Copy .env file (if not already present)
+    # Copy .env file, if not already exists
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
-    # Install project dependencies
+    # Ensure SQLite database path is correct (Create the SQLite DB if needed)
+    - name: Ensure SQLite Database Exists
+      run: |
+        mkdir -p /var/www/laravel/database
+        touch /var/www/laravel/database/database.sqlite
+        chmod -R 777 /var/www/laravel/database
+
+    # Install Composer dependencies
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-    # Generate application key
+    # Generate the application key
     - name: Generate key
       run: php artisan key:generate
 
-    # Set permissions for directories
+    # Set directory permissions for storage and cache
     - name: Directory Permissions
-      run: chmod -R 777 storage bootstrap/cache
-
-    # Create SQLite Database file if not exists
-    - name: Create Database (if needed)
       run: |
-        mkdir -p database
-        touch database/database.sqlite
-        chmod 777 database/database.sqlite
+        chmod -R 777 storage bootstrap/cache
 
-    # Run tests (Unit and Feature tests) via PHPUnit/Pest
+    # Run Laravel Tests (optional but recommended to validate the deployment)
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       env:
         DB_CONNECTION: sqlite
-        DB_DATABASE: database/database.sqlite
+        DB_DATABASE: /var/www/laravel/database/database.sqlite
       run: php artisan test
 
     # Deploy to EC2 Server
@@ -62,28 +60,38 @@ jobs:
         SERVER_IP: ${{ secrets.EC2_SERVER_IP }}
         SERVER_USER: ${{ secrets.EC2_SERVER_USER }}
       run: |
-        # Save SSH private key and set permissions
         echo "$SSH_PRIVATE_KEY" > private_key.pem
         chmod 600 private_key.pem
-        
-        # Connect to EC2 and deploy
         ssh -o StrictHostKeyChecking=no -i private_key.pem $SERVER_USER@$SERVER_IP << 'EOF'
-          # Navigate to the Laravel project directory
+          # Add Git repository to safe directory list
+          git config --global --add safe.directory /var/www/laravel
+
+          # Ensure SQLite database file exists on the server
+          mkdir -p /var/www/laravel/database
+          touch /var/www/laravel/database/database.sqlite
+          chmod -R 777 /var/www/laravel/database
+
+          # Set proper permissions and ownership for storage and bootstrap/cache
+          chown -R www-data:www-data /var/www/laravel/storage /var/www/laravel/bootstrap/cache
+          chmod -R 775 /var/www/laravel/storage /var/www/laravel/bootstrap/cache
+
+          # Navigate to your Laravel project directory
           cd /var/www/laravel
 
-          # Pull the latest changes from the main branch
+          # Pull the latest changes from GitHub
           git pull origin main
 
-          # Install Composer dependencies on the server
+          # Install Composer dependencies
           composer install --no-interaction --prefer-dist
 
-          # Run database migrations (force flag to avoid prompts)
+          # Run database migrations
           php artisan migrate --force
 
-          # Clear and cache configurations and routes
+          # Clear and cache configurations
           php artisan config:cache
           php artisan route:cache
-
-          # Optimize Laravel application
           php artisan optimize
+
+          # Set directory permissions for storage/cache (optional, but useful)
+          chmod -R 777 storage bootstrap/cache
         EOF
