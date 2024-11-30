@@ -1,27 +1,17 @@
-name: Deploy
+name: Laravel
 
-# Trigger the workflow on push and 
-# pull request events on the production branch
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - main
-      
-# Authenticate to the the server via ssh 
-# and run our deployment script 
+    branches: [ "main" ]
+
 jobs:
-  deploy:
+  laravel-tests:
+
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Deploy to server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          port: ${{ secrets.PORT }}
-          key: ${{ secrets.SSHKEY }}
-          script: "cd /var/www/html && ./.scripts/deploy.sh"
+    - uses: actions/checkout@v4
+    - name: Check Current Directory
+      run: pwd
