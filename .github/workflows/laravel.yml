@@ -1,17 +1,18 @@
-name: Laravel
+name: Deploy Application
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
-  laravel-tests:
-
+  create-deployment-artifacts:
+    name: Create deployment artifacts
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Check Current Directory
-      run: pwd
+      - uses: actions/checkout@v3
+
+      - name: Compile CSS and Javascript
+        run: |
+          npm install
+          npm run dev
