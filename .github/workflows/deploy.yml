@@ -51,9 +51,8 @@ jobs:
             cd ~/bigdashboard_pso
             git checkout -b dev
             echo "IMAGE_VER=${{ github.run_number }}" > .env
+            sudo nginx -t
+            sudo service nginx restart
             git pull origin dev
             sudo docker compose --env-file .env build
             sudo docker compose --env-file .env up -d
-            sudo service nginx restart
-            sudo nginx -t
-            tail -f /var/log/nginx/error.log
