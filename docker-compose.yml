@@ -5,10 +5,6 @@ services:
         container_name: laravel
         restart: unless-stopped
         tty: true
-        healthcheck:
-            test: ["CMD", "curl", "-f", "http://localhost:9000"]
-            interval: 30s
-            retries: 5
         volumes:
             - .env:/var/www/.env
         networks:
