@@ -38,7 +38,6 @@ jobs:
 
   deployment:
     needs: build
-    environment: staging
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to VPS
