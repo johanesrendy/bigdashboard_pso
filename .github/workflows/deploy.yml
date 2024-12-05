@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push app image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Docker/dockerfile/app.Dockerfile
@@ -29,7 +29,7 @@ jobs:
           tags: johanesrendy/laravel:latest-${{ github.run_number }}
 
       - name: Build and push nginx image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Docker/dockerfile/nginx.Dockerfile
@@ -40,13 +40,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Debug - Check Docker Image Tag Format
-        run: |
-          IMAGE_TAG_APP="johanesrendy/laravel:latest-${{ github.run_number }}"
-          IMAGE_TAG_NGINX="johanesrendy/laravel-nginx:latest-${{ github.run_number }}"
-          echo "Docker Tag for app image: $IMAGE_TAG_APP"
-          echo "Docker Tag for nginx image: $IMAGE_TAG_NGINX"
-
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
@@ -57,8 +50,6 @@ jobs:
           script: |
             whoami
             export IMAGE_VER=${{ github.run_number }}
-            pwd
-            ls
             cd ~/bigdashboard_pso && git checkout -b dev
             git pull origin dev
             sudo docker compose build 
