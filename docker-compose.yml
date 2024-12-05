@@ -1,139 +1,28 @@
-version: "3"
-
-networks:
-  laravel:
-
+version: '3'
 services:
-  site:
-    build:
-      context: ./dockerfiles
-      dockerfile: nginx.dockerfile
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
-        - USER=${USER:-youruser}
-    container_name: nginx
-    ports:
-      - 80:80
+  app:
+    image: hellodit/laratm:${IMAGE_VER}
+    container_name: laratm
+    restart: unless-stopped
+    tty: true
     volumes:
-      - ./:/var/www/html:delegated
-    depends_on:
-      - php
-      - redis
-      - mysql
-      - mailhog
+      - .env:/var/www/.env
     networks:
-      - laravel
+      - laratm-net
 
-  mysql:
-    image: mariadb:10.6
-    container_name: mysql
+  nginx:
+    image: hellodit/laratm-nginx:${IMAGE_VER}
+    container_name: nginx
     restart: unless-stopped
     tty: true
     ports:
-      - 3306:3306
-    environment:
-      MYSQL_DATABASE: pso
-      MYSQL_USER: pso
-      MYSQL_PASSWORD: pso
-      MYSQL_ROOT_PASSWORD: pso # Ensure this matches your .env file
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
-    networks:
-      - laravel
-
-  php:
-    build:
-      context: ./dockerfiles
-      dockerfile: php.dockerfile
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
-        - USER=${USER:-youruser}
-    container_name: php
-    volumes:
-      - ./:/var/www/html:delegated
-    networks:
-      - laravel
-
-  redis:
-    image: redis:alpine
-    container_name: redis
-    restart: unless-stopped
-    ports:
-      - 6379:6379
-    networks:
-      - laravel
-
-  composer:
-    build:
-      context: ./dockerfiles
-      dockerfile: composer.dockerfile
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
-        - USER=${USER:-youruser}
-    container_name: composer
-    volumes:
-      - ./:/var/www/html
-    working_dir: /var/www/html
+      - "8002:80"
     depends_on:
-      - php
-    user: ${USER:-youruser}
-    entrypoint: ["composer", "--ignore-platform-reqs"]
+      - app
     networks:
-      - laravel
+      - laratm-net
 
-  npm:
-    image: node:13.7
-    container_name: npm
-    volumes:
-      - ./:/var/www/html
-    ports:
-      - 3000:3000
-      - 3001:3001
-    working_dir: /var/www/html
-    entrypoint: ["npm"]
-    networks:
-      - laravel
-
-  artisan:
-    build:
-      context: ./dockerfiles
-      dockerfile: php.dockerfile
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
-        - USER=${USER:-youruser}
-    container_name: artisan
-    volumes:
-      - ./:/var/www/html:delegated
-    depends_on:
-      - mysql
-    working_dir: /var/www/html
-    entrypoint: ["php", "/var/www/html/artisan"]
-    networks:
-      - laravel
-
-  mailhog:
-    image: mailhog/mailhog:latest
-    container_name: mailhog
-    ports:
-      - 1025:1025
-      - 8025:8025
-    networks:
-      - laravel
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:4.8.5
-    container_name: phpmyadmin
-    restart: unless-stopped
-    ports:
-      - 8080:80
-    environment:
-      PMA_HOST: mysql
-      MYSQL_ROOT_PASSWORD: pso # Ensure this matches your .env file
-    depends_on:
-      - mysql
-    networks:
-      - laravel
+#Docker Networks
+networks:
+  laratm-net:
+    driver: bridge
