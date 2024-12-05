@@ -52,9 +52,8 @@ jobs:
             git checkout -b dev
             echo "IMAGE_VER=${{ github.run_number }}" > .env
             git pull origin dev
-            sudo service nginx restart
-            sudo nginx -t
-            sudo service php-fpm status
-            sudo service php-fpm restart
             sudo docker compose --env-file .env build
             sudo docker compose --env-file .env up -d
+            sudo service nginx restart
+            sudo nginx -t
+            tail -f /var/log/nginx/error.log
