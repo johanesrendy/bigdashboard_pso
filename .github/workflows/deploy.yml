@@ -8,17 +8,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set IMAGE_VER environment variable for docker-compose
+        run: echo "IMAGE_VER=latest-${{ github.run_number }}" >> $GITHUB_ENV
 
       - name: Build and push app image
         uses: docker/build-push-action@v6
@@ -26,7 +20,7 @@ jobs:
           context: .
           file: ./Docker/dockerfile/app.Dockerfile
           push: true
-          tags: johanesrendy/laravel:latest-${{ github.run_number }}
+          tags: johanesrendy/laravel:${{ env.IMAGE_VER }}
 
       - name: Build and push nginx image
         uses: docker/build-push-action@v6
@@ -34,7 +28,7 @@ jobs:
           context: .
           file: ./Docker/dockerfile/nginx.Dockerfile
           push: true
-          tags: johanesrendy/laravel-nginx:latest-${{ github.run_number }}
+          tags: johanesrendy/laravel-nginx:${{ env.IMAGE_VER }}
 
   deployment:
     needs: build
@@ -48,9 +42,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            whoami
             export IMAGE_VER=${{ github.run_number }}
             cd ~/bigdashboard_pso && git checkout -b dev
             git pull origin dev
-            sudo docker compose build 
+            sudo docker compose build
             sudo docker compose up -d
