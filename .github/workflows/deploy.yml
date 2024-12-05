@@ -52,4 +52,5 @@ jobs:
             cd ~/bigdashboard_pso && git checkout -b dev
             git pull origin dev
             sudo docker compose build
-            # sudo docker compose up -d
+            sudo docker compose up -d
+            docker logs debug-container
