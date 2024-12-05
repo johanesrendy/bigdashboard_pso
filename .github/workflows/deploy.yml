@@ -56,5 +56,5 @@ jobs:
             git pull origin dev
             sudo docker compose --env-file .env build
             sudo docker compose --env-file .env up -d
-            docker logs laravel
-            docker logs nginx
+            sudo docker logs laravel
+            sudo docker logs nginx
