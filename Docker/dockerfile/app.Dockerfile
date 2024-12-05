@@ -43,6 +43,7 @@ USER www-data
 # Install dependency
 WORKDIR /var/www
 
+RUN composer update -v
 RUN composer install -v
 
 # Expose port 9000
