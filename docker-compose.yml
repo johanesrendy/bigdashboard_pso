@@ -9,6 +9,8 @@ services:
             - .env:/var/www/.env
         networks:
             - laravel-net
+        environment:
+            IMAGE_VER: ${IMAGE_VER}
 
     nginx:
         image: johanesrendy/laravel-nginx:${IMAGE_VER}
@@ -21,6 +23,8 @@ services:
             - app
         networks:
             - laravel-net
+        environment:
+            IMAGE_VER: ${IMAGE_VER}
 
 #Docker Networks
 networks:

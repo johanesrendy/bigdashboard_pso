@@ -48,9 +48,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            export IMAGE_VER=${{ github.run_number }}
+            echo "IMAGE_VER=${{ github.run_number }}" > .env
             cd ~/bigdashboard_pso && git checkout -b dev
             git pull origin dev
-            echo "IMAGE_VER=${IMAGE_VER}"
-            sudo docker compose build
-            sudo docker compose up -d
+            sudo docker compose --env-file .env build
+            sudo docker compose --env-file .env up -d
