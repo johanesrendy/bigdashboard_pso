@@ -26,7 +26,7 @@ jobs:
           context: .
           file: ./Docker/dockerfile/app.Dockerfile
           push: true
-          tags: johanesrendy/laravel:${{ github.run_number }}-latest
+          tags: johanesrendy/laravel:latest-${{ github.run_number }}-latest
 
       - name: Build and push nginx image
         uses: docker/build-push-action@v4
@@ -34,7 +34,7 @@ jobs:
           context: .
           file: ./Docker/dockerfile/nginx.Dockerfile
           push: true
-          tags: johanesrendy/laravel-nginx:${{ github.run_number }}-latest
+          tags: johanesrendy/laravel-nginx:latest-${{ github.run_number }}
 
   deployment:
     needs: build
