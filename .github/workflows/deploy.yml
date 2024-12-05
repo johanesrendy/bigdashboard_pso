@@ -40,13 +40,12 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Debug - Print GitHub Run Number
+      - name: Debug - Check Docker Image Tag Format
         run: |
-          echo "GitHub Run Number: ${{ github.run_number }}"
-          echo "GitHub Event Name: ${{ github.event_name }}"
-          echo "GitHub Repository: ${{ github.repository }}"
-          echo "GitHub SHA: ${{ github.sha }}"
-          echo "GitHub Ref: ${{ github.ref }}"
+          IMAGE_TAG_APP="johanesrendy/laravel:latest-${{ github.run_number }}"
+          IMAGE_TAG_NGINX="johanesrendy/laravel-nginx:latest-${{ github.run_number }}"
+          echo "Docker Tag for app image: $IMAGE_TAG_APP"
+          echo "Docker Tag for nginx image: $IMAGE_TAG_NGINX"
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
