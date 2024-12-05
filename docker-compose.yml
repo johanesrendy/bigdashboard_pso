@@ -2,13 +2,13 @@ version: "3"
 services:
     app:
         image: johanesrendy/laravel:${IMAGE_VER}
-        container_name: laratm
+        container_name: laravel
         restart: unless-stopped
         tty: true
         volumes:
             - .env:/var/www/.env
         networks:
-            - laratm-net
+            - laravel-net
 
     nginx:
         image: johanesrendy/laravel-nginx:${IMAGE_VER}
@@ -20,9 +20,9 @@ services:
         depends_on:
             - app
         networks:
-            - laratm-net
+            - laravel-net
 
 #Docker Networks
 networks:
-    laratm-net:
+    laravel-net:
         driver: bridge
