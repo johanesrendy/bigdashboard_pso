@@ -53,6 +53,7 @@ jobs:
             echo "IMAGE_VER=${{ github.run_number }}" > .env
             sudo nginx -t
             sudo service nginx restart
+            tail -f /var/log/nginx/error.log
             git pull origin dev
             sudo docker compose --env-file .env build
             sudo docker compose --env-file .env up -d
