@@ -48,7 +48,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            sudo export IMAGE_VER=${{ github.run_number }}
+            export IMAGE_VER=${{ github.run_number }}
             cd ~/bigdashboard_pso && git checkout -b dev
             git pull origin dev
             echo "IMAGE_VER=${IMAGE_VER}"
