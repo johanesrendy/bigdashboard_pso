@@ -48,3 +48,5 @@ RUN composer install -v
 
 # Expose port 9000
 EXPOSE 9000
+
+RUN ps aux | grep php-fpm

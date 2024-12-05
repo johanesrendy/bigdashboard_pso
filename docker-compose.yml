@@ -11,6 +11,8 @@ services:
             - laravel-net
         environment:
             IMAGE_VER: ${IMAGE_VER}
+        expose:
+            - "9000"
 
     nginx:
         image: johanesrendy/laravel-nginx:${IMAGE_VER}
