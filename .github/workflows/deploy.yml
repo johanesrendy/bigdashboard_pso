@@ -52,7 +52,7 @@ jobs:
             export IMAGE_VER=${{ github.run_number }}
             pwd
             ls
-            cd ~/bigdashboard_pso && git checkout -b staging
-            git pull origin staging
+            cd ~/bigdashboard_pso && git checkout -b dev
+            git pull origin dev
             docker compose build 
             docker compose up -d
