@@ -50,6 +50,8 @@ jobs:
           script: |
             whoami
             export IMAGE_VER=${{ github.run_number }}
+            pwd
+            ls
             cd ~/bigdashboard_pso/app/laravel && git checkout -b staging
             git pull origin staging
             docker compose build 
