@@ -48,7 +48,7 @@ USER www-data
 WORKDIR /var/www
 
 # Install dependensi PHP menggunakan Composer (sebagai www-data)
-RUN composer install -v --no-interaction --prefer-dist
+RUN composer install -v
 
 # Expose port 9000 untuk PHP-FPM
 EXPOSE 9000
