@@ -7,10 +7,17 @@ services:
         tty: true
         volumes:
             - .env:/var/www/.env
+            - ./your-laravel-app:/var/www/html # Adjust path as needed
         networks:
             - laravel-net
         environment:
             IMAGE_VER: ${IMAGE_VER}
+        healthcheck:
+            test: ["CMD", "curl", "--silent", "--fail", "http://localhost:9000"]
+            interval: 30s
+            retries: 3
+            timeout: 10s
+            start_period: 10s
 
     nginx:
         image: johanesrendy/laravel-nginx:${IMAGE_VER}
@@ -27,7 +34,7 @@ services:
         environment:
             IMAGE_VER: ${IMAGE_VER}
 
-#Docker Networks
+# Docker Networks
 networks:
     laravel-net:
         driver: bridge
