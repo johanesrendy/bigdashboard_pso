@@ -48,7 +48,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            systemctl start docker
+            sudo systemctl start docker
             cd ~/bigdashboard_pso
             git checkout -b dev
             echo "IMAGE_VER=${{ github.run_number }}" > .env
