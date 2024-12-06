@@ -48,10 +48,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            sudo systemctl start docker
             cd ~/bigdashboard_pso
             git checkout -b dev
-            echo "IMAGE_VER=${{ github.run_number }}" > .env
+            npm i
+            sed -i '' '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
             sudo nginx -t
             sudo service nginx restart
             sudo systemctl status nginx
