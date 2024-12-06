@@ -4,9 +4,13 @@ FROM php:8.2-fpm
 ENV HOST_GID=1000 \
     HOST_UID=1000
 
-# Tambahkan grup dan pengguna dengan UID dan GID yang sama
-RUN groupadd -g $HOST_GID www-data && \
-    useradd -u $HOST_UID -g www-data -m www-data
+# Cek apakah grup dan pengguna www-data sudah ada, jika tidak, buat grup dan pengguna dengan UID dan GID yang ditentukan
+RUN if ! getent group www-data; then \
+        groupadd -g $HOST_GID www-data; \
+    fi && \
+    if ! getent passwd www-data; then \
+        useradd -u $HOST_UID -g www-data -m www-data; \
+    fi
 
 # Install dependencies untuk PHP
 RUN apt-get update && apt-get install -y \
