@@ -21,20 +21,20 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push app image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Docker/dockerfile/app.Dockerfile
           push: true
-          tags: hellodit/laratm:${{ github.run_number }}
+          tags: johanesrendy/laravel:${{ github.run_number }}
 
       - name: Build and push nginx image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Docker/dockerfile/nginx.Dockerfile
           push: true
-          tags: hellodit/laratm-nginx:${{ github.run_number }}
+          tags: johanesrendy/laravel-nginx:${{ github.run_number }}
 
   deployment:
     needs: build
@@ -43,14 +43,20 @@ jobs:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SERVER }}
+          host: "3.27.244.65"
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            whoami
-            export IMAGE_VER=${{ github.run_number }}
-            cd ~/app/laratm && git checkout -b staging
-            git pull origin staging
-            docker compose build 
-            docker compose up -d
+            cd ~/bigdashboard_pso
+            git checkout -b dev
+            npm i
+            sed -i '' '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
+            sudo nginx -t
+            sudo service nginx restart
+            sudo systemctl status nginx
+            git pull origin dev
+            sudo docker compose --env-file .env build
+            sudo docker compose --env-file .env up -d
+            sudo docker logs laravel
+            sudo docker logs nginx
