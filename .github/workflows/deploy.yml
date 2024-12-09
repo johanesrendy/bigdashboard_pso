@@ -43,14 +43,13 @@ jobs:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
-          host: "54.206.29.13"
+          host: "3.106.226.250"
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ~/bigdashboard_pso
             git checkout -b dev
-            npm i
             sed -i '' '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
             sudo nginx -t
             sudo service nginx restart
