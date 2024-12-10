@@ -1,29 +1,32 @@
-version: "3.7"
+version: "3"
 services:
-    laravel:
-        build:
-            context: .
-            dockerfile: Docker/dockerfile/app.Dockerfile
+    app:
+        image: johanesrendy/laravel:${IMAGE_VER}
         container_name: laravel
-        ports:
-            - "8002:9000"
+        restart: unless-stopped
+        tty: true
         volumes:
-            - .:/var/www
+            - .env:/var/www/.env
         networks:
-            - backend
+            - laravel-net
+        environment:
+            IMAGE_VER: ${IMAGE_VER}
 
     nginx:
-        build:
-            context: .
-            dockerfile: Docker/dockerfile/nginx.Dockerfile
+        image: johanesrendy/laravel-nginx:${IMAGE_VER}
         container_name: nginx
+        restart: unless-stopped
+        tty: true
         ports:
-            - "80:80"
+            - "8002:80"
         depends_on:
-            - laravel
+            - app
         networks:
-            - backend
+            - laravel-net
+        environment:
+            IMAGE_VER: ${IMAGE_VER}
 
+# Docker Networks
 networks:
-    backend:
+    laravel-net:
         driver: bridge
