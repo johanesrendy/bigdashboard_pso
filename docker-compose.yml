@@ -18,7 +18,7 @@ services:
         restart: unless-stopped
         tty: true
         ports:
-            - "8002:80"
+            - "8005:80"
         depends_on:
             - app
         networks:
