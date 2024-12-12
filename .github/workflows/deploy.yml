@@ -50,14 +50,33 @@ jobs:
           script: |
             cd ~/bigdashboard_pso
             git checkout -b dev
+
+            # Update IMAGE_VER in .env
             sed -i '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
+
+            # Restart Nginx
             sudo nginx -t
             sudo service nginx restart
             sudo systemctl status nginx
+
+
             git pull origin dev
+
+            # Install Composer dependencies
             composer i
+
+            # Docker: Bring down the current containers and rebuild them
             sudo docker-compose --env-file .env down
             sudo docker compose --env-file .env build
             sudo docker compose --env-file .env up -d
+
+            # Install npm dependencies and build assets in container
+            sudo docker-compose exec app npm install
+            sudo docker-compose exec app npm run build
+
+            # Run npm dev server in the background
+            sudo docker-compose exec app npm run dev &
+
+            # Show logs for debugging
             sudo docker logs laravel
             sudo docker logs nginx

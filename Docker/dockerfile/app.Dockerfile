@@ -46,15 +46,6 @@ RUN chown -R www-data:www-data /var/www
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Remove existing node_modules and package-lock.json to prevent errors
-RUN rm -rf /var/www/node_modules /var/www/package-lock.json
-
-# Install Node.js dependencies
-RUN npm install
-
-# Run npm build (to generate assets)
-RUN npm run build
-
 # Set up permissions for storage folder
 RUN mkdir -p /var/www/storage && \
     chown -R www-data:www-data /var/www/storage && \
@@ -67,9 +58,3 @@ RUN touch /var/www/storage/logs/laravel.log && \
 
 # Expose PHP-FPM and npm dev server ports
 EXPOSE 9000 3000
-
-# Copy entrypoint script to Docker container and set it as executable
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
-ENTRYPOINT ["entrypoint.sh"]
