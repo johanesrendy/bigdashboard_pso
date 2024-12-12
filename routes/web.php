@@ -6,8 +6,6 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 
-use App\Http\Controllers\ContactImportController;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,63 +17,41 @@ use App\Http\Controllers\ContactImportController;
 |
 */
 
+// Route default untuk halaman utama
 Route::get('/', function () {
     return view('welcome');
-});
-
-// Route::get('/dbconn', function () {
-//     return view('dbconn');
-// });
-
+})->name('welcome');
 
 // Rute untuk menampilkan daftar kontak
-// Menampilkan daftar kontak dengan pencarian, filter, dan pengurutan
-Route::get('/beranda', [ContactController::class, 'index'])->name('contacts.index');
+Route::get('/beranda', [ContactController::class, 'index'])->name('contacts.index'); // Daftar kontak di beranda
 
+// Tracker dan Leads
 Route::get('/tracker', [ContactController::class, 'tracker'])->name('data.tracker');
-
 Route::get('/leads', [ContactController::class, 'leads'])->name('data.leads');
 
-Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
 // Menampilkan formulir untuk menambahkan kontak baru
 Route::get('/contacts/form', [ContactController::class, 'form'])->name('contacts.form');
 
-// Menampilkan formulir untuk menambahkan kontak baru
+// Import Kontak
 Route::get('/contacts/import', [ContactController::class, 'import'])->name('contacts.import');
-
 Route::post('/contacts/import', [ContactController::class, 'importPost'])->name('contacts.import.post');
-
-
 
 // Export data leads
 Route::get('/contacts/export', [ContactController::class, 'export'])->name('contacts.export');
+Route::post('/contacts/export', [ContactController::class, 'exportData'])->name('contacts.exportData');
 
-Route::post('/contacts/export', [ContactController::class, 'exportData'])->name('contacts.export');
+// CRUD Kontak
+Route::post('/contacts', [ContactController::class, 'store'])->name('contacts.store'); // Menyimpan kontak baru
+Route::get('/contacts/{id}', [ContactController::class, 'detailContact'])->name('contacts.detailContact'); // Detail kontak
+Route::get('/contacts/{id}/edit', [ContactController::class, 'editForm'])->name('contacts.edit'); // Form edit kontak
+Route::put('/contacts/{id}', [ContactController::class, 'update'])->name('contacts.update'); // Update kontak
+Route::delete('/contacts/{id}', [ContactController::class, 'destroy'])->name('contacts.destroy'); // Hapus kontak
 
-// Menyimpan kontak baru
-Route::post('/contacts', [ContactController::class, 'store'])->name('contacts.store');
+// Update status lead
+Route::put('/contacts/{id}/update-lead-status', [ContactController::class, 'updateLeadStatus'])->name('contacts.updateLeadStatus');
 
-
-// Rute untuk menampilkan detail kontak
-Route::get('/contacts/{id}', [ContactController::class, 'detailContact'])->name('contacts.detailContact');
-
-// Rute untuk menampilkan formulir untuk mengedit kontak
-Route::get('/contacts/{id}/edit', [ContactController::class, 'getContact'])->name('contacts.getContact');
-Route::get('/contacts/{id}/edit', [ContactController::class, 'editForm'])->name('contacts.edit');
-
-
-
-// Rute untuk memperbarui kontak yang ada
-Route::put('/contacts/{id}', [ContactController::class, 'update'])->name('contacts.update');
-
-// Rute untuk menghapus kontak
-Route::delete('/contacts/{id}', [ContactController::class, 'destroy'])->name('contacts.destroy');
-
-// // Menampilkan formulir impor Excel
-// Route::get('/contacts/import', [ContactController::class, 'importForm'])->name('contacts.import');
-
-
-
+// Log Aktivitas
+Route::get('/contacts/logs', [ContactController::class, 'logs'])->name('contacts.logs');
 
 // Rute untuk pendaftaran pengguna
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
@@ -90,9 +66,3 @@ Route::post('/logout', function () {
     Auth::logout();
     return redirect('/login');
 })->name('logout');
-
-// Rute untuk menampilkan log aktivitas
-Route::get('/contacts/logs', [ContactController::class, 'logs'])->name('contacts.logs');
-
-// web.php
-Route::put('/contacts/{id}/update-lead-status', [ContactController::class, 'updateLeadStatus'])->name('contacts.updateLeadStatus');
