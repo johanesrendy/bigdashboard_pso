@@ -48,11 +48,17 @@ RUN composer install --no-dev --optimize-autoloader
 
 # Install Node.js dependencies
 RUN npm install
+RUN npm run build
 
 # Set up permissions for storage folder
 RUN mkdir -p /var/www/storage && \
     chown -R www-data:www-data /var/www/storage && \
     chmod -R 775 /var/www/storage
+
+# Create log file with correct permissions
+RUN touch /var/www/storage/logs/laravel.log && \
+    chown www-data:www-data /var/www/storage/logs/laravel.log && \
+    chmod 664 /var/www/storage/logs/laravel.log
 
 # Expose PHP-FPM and npm dev server ports
 EXPOSE 9000 3000
