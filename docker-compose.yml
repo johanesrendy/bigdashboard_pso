@@ -34,6 +34,16 @@ services:
         environment:
             IMAGE_VER: ${IMAGE_VER}
 
+    npm:
+        image: node:latest
+        container_name: npm
+        volumes:
+            - .:/var/www/html
+        working_dir: /var/www/html
+        entrypoint: ["npm", "--no-bin-links"]
+        networks:
+            - laravel-net
+
 # Docker Networks
 networks:
     laravel-net:
