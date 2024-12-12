@@ -50,7 +50,7 @@ jobs:
           script: |
             cd ~/bigdashboard_pso
             git checkout -b dev
-            sed -i '' '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
+            sed -i '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
             sudo nginx -t
             sudo service nginx restart
             sudo systemctl status nginx
