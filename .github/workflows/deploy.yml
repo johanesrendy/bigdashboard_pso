@@ -70,6 +70,9 @@ jobs:
             sudo docker compose --env-file .env build
             sudo docker compose --env-file .env up -d
 
+            #delete node modules and package-lock to prevent error
+            sudo docker-compose exec app rm -rf /var/www/node_modules /var/www/package-lock.json
+
             # Install npm dependencies and build assets in container
             sudo docker-compose exec app npm install
             sudo docker-compose exec app npm run build
