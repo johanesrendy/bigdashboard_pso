@@ -27,9 +27,6 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs && \
     npm install -g npm@latest
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl
 RUN docker-php-ext-configure gd --with-jpeg=/usr/include/ --with-freetype=/usr/include/
@@ -52,10 +49,15 @@ RUN composer install --no-dev --optimize-autoloader
 # Install Node.js dependencies
 RUN npm install
 
+# Set up permissions for storage folder
+RUN mkdir -p /var/www/storage && \
+    chown -R www-data:www-data /var/www/storage && \
+    chmod -R 775 /var/www/storage
+
 # Expose PHP-FPM and npm dev server ports
 EXPOSE 9000 3000
 
-# Tambahkan entrypoint script untuk menjalankan Laravel dan npm
+# Copy entrypoint script to Docker container and set it as executable
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
