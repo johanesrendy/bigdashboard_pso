@@ -55,6 +55,9 @@ RUN npm install
 # Expose PHP-FPM and npm dev server ports
 EXPOSE 9000 3000
 
+# Cek current directory
+RUN pwd
+
 # Tambahkan entrypoint script untuk menjalankan Laravel dan npm
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
