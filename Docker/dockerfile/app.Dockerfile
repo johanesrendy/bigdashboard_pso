@@ -48,6 +48,7 @@ RUN composer install --no-dev --optimize-autoloader
 
 # Remove existing node_modules and package-lock.json to prevent errors
 RUN rm -rf /var/www/node_modules /var/www/package-lock.json
+RUN rm -rf /public/hot
 
 # Install Node.js dependencies
 RUN npm install
