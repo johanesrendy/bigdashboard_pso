@@ -1,4 +1,5 @@
 version: "3"
+
 services:
     app:
         image: johanesrendy/laravel:${IMAGE_VER}
@@ -6,11 +7,14 @@ services:
         restart: unless-stopped
         tty: true
         volumes:
-            - .env:/var/www/.env
+            - .:/var/www # Pastikan source code Laravel ada di dalam container
+            - .env:/var/www/.env # Memetakan file .env untuk Laravel
         networks:
             - laravel-net
         environment:
             IMAGE_VER: ${IMAGE_VER}
+        depends_on:
+            - nginx # Pastikan aplikasi menunggu hingga Nginx siap
 
     nginx:
         image: johanesrendy/laravel-nginx:${IMAGE_VER}
@@ -18,9 +22,12 @@ services:
         restart: unless-stopped
         tty: true
         ports:
-            - "8005:80"
+            - "8005:80" # Memetakan port 8005 di host ke port 80 di container
+        volumes:
+            - .:/var/www # Memetakan source code Laravel di dalam container
+            - ./nginx.conf:/etc/nginx/nginx.conf # Memastikan Nginx terkonfigurasi dengan benar
         depends_on:
-            - app
+            - app # Menunggu kontainer aplikasi PHP siap
         networks:
             - laravel-net
         environment:
