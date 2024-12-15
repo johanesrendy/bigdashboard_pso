@@ -36,6 +36,14 @@ jobs:
           push: true
           tags: johanesrendy/laravel-nginx:${{ github.run_number }}
 
+      - name: Build and push npm image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Docker/dockerfile/npm.Dockerfile
+          push: true
+          tags: johanesrendy/laravel-npm:${{ github.run_number }}
+
   deployment:
     needs: build
     runs-on: ubuntu-latest
@@ -74,5 +82,5 @@ jobs:
             sudo docker logs laravel
             echo "log nginx"
             sudo docker logs nginx
-            echo "log npm"
+            echo "log npm container"
             sudo docker logs npm
