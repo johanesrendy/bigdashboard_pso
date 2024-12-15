@@ -64,10 +64,6 @@ jobs:
             # Install Composer dependencies
             composer i
 
-            docker-compose run --rm npm install
-            docker-compose run --rm npm run build
-            docker-compose run --rm npm run dev
-
             # Docker: Bring down the current containers and rebuild them
             sudo docker-compose --env-file .env down
             sudo docker compose --env-file .env build
