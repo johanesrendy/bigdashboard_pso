@@ -11,7 +11,7 @@ COPY package.json ./
 RUN rm -rf node_modules package-lock.json
 
 # Install dependencies
-RUN npm i
+RUN npm i --legacy-peer-deps
 
 # Copy seluruh source code aplikasi ke dalam container
 COPY . .
