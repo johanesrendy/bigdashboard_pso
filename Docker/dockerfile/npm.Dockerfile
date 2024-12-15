@@ -20,7 +20,7 @@ RUN npm i --legacy-peer-deps
 COPY . .
 
 # Hapus public/hot
-RUN rm -rf public/hot
+RUN rm -rf /var/www/public/hot
 
 # Menjalankan frontend build
 CMD ["npm", "run", "dev"]
