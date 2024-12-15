@@ -11,17 +11,16 @@ RUN npm install -g npm@latest
 COPY package.json ./
 
 # Hapus public/hot
-RUN chmod -R 777 public/hot && rm -rf public/hot
+RUN pwd && ls
 
+# Hapus node_modules dan package-lock.json jika ada (antisipasi cache sebelumnya)
+RUN rm -rf node_modules package-lock.json
 
 # Install dependencies
 RUN npm i --legacy-peer-deps
 
 # Copy seluruh source code aplikasi ke dalam container
 COPY . .
-
-# Hapus node_modules dan package-lock.json jika ada (antisipasi cache sebelumnya)
-RUN rm -rf node_modules package-lock.json
 
 # Menjalankan frontend build
 CMD ["npm", "run", "dev"]
