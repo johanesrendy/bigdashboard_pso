@@ -70,6 +70,9 @@ jobs:
             sudo docker compose --env-file .env up -d
 
             # Show logs for debugging
+            echo "log laravel"
             sudo docker logs laravel
+            echo "log nginx"
             sudo docker logs nginx
+            echo "log npm"
             sudo docker logs npm
