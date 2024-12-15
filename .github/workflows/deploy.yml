@@ -74,7 +74,6 @@ jobs:
 
             # Docker: Bring down the current containers and rebuild them
             sudo docker-compose --env-file .env down
-            sudo docker rmi johanesrendy/laravel:${IMAGE_VER} johanesrendy/laravel-nginx:${IMAGE_VER} johanesrendy/laravel-npm:${IMAGE_VER}
             sudo docker compose --env-file .env up -d build
 
             # Show logs for debugging
