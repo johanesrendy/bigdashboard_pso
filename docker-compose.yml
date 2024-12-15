@@ -22,9 +22,6 @@ services:
         ports:
             - "8005:80" # Port untuk akses Nginx
             - "5173:5173" # Port untuk frontend (Vite)
-        volumes:
-            - .:/var/www # Source code Laravel
-            - ./nginx.conf:/etc/nginx/nginx.conf # Konfigurasi Nginx
         depends_on:
             - app # Nginx menunggu app siap
         networks:
