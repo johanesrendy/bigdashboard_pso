@@ -35,16 +35,17 @@ services:
             IMAGE_VER: ${IMAGE_VER}
 
     npm:
-        image: node:latest
+        image: johanesrendy/laravel-npm:${IMAGE_VER}
         container_name: npm
+        restart: unless-stopped
+        tty: true
         volumes:
-            - .:/var/www
-        working_dir: /var/www
-        entrypoint: ["sh", "-c", "npm install && npm run build && npm run dev"]
+            - .:/var/www/html
+        working_dir: /var/www/html
         networks:
             - laravel-net
         depends_on:
-            - app # Menunggu aplikasi siap sebelum menjalankan npm commands
+            - app
 
 # Docker Networks
 networks:
