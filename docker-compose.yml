@@ -14,7 +14,7 @@ services:
         environment:
             IMAGE_VER: ${IMAGE_VER}
         depends_on:
-            - nginx # Pastikan aplikasi menunggu hingga Nginx siap
+            - npm # Pastikan aplikasi menunggu hingga npm siap
 
     nginx:
         image: johanesrendy/laravel-nginx:${IMAGE_VER}
@@ -40,12 +40,13 @@ services:
         restart: unless-stopped
         tty: true
         volumes:
-            - .:/var/www/html
-        working_dir: /var/www/html
+            - .:/var/www
+        working_dir: /var/www
         networks:
             - laravel-net
         depends_on:
             - app
+        command: ["npm", "run", "dev"]
 
 # Docker Networks
 networks:
