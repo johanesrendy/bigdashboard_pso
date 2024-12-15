@@ -1,8 +1,11 @@
 # Gunakan image node.js sebagai dasar
-FROM node:latest
+FROM node:18-bullseye
 
 # Set working directory
 WORKDIR /var/www
+
+# Update npm version
+RUN npm install -g npm@latest
 
 # Copy file package.json dan package-lock.json
 COPY package.json ./
