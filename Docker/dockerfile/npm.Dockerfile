@@ -13,6 +13,9 @@ COPY package.json ./
 # Hapus node_modules dan package-lock.json jika ada (antisipasi cache sebelumnya)
 RUN rm -rf node_modules package-lock.json
 
+# Hapus public/hot
+RUN rm -rf public/hot
+
 # Install dependencies
 RUN npm i --legacy-peer-deps
 
