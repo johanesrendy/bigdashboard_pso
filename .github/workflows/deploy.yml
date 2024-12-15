@@ -72,3 +72,4 @@ jobs:
             # Show logs for debugging
             sudo docker logs laravel
             sudo docker logs nginx
+            sudo docker logs npm
