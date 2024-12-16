@@ -11,7 +11,7 @@ on:
 
 permissions:
   pull-requests: write
-  contents: write
+  contents: write  # Diperlukan untuk merge otomatis
 
 jobs:
   sonarcloud-analysis:
@@ -20,33 +20,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Pastikan semua riwayat tersedia
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: 'zulu'
+      - name: Install SonarScanner CLI
+        run: |
+          wget -q -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+          unzip sonar-scanner.zip
+          mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner
+          export PATH="/opt/sonar-scanner/bin:$PATH"
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v4.1.0
+      - name: Run SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectBaseDir: .
-          args: >
-            -Dsonar.projectKey=johanesrendy_bigdashboard_pso
-            -Dsonar.organization=big-dashboard-pso
-            -Dsonar.sources=.
-            -Dsonar.host.url=https://sonarcloud.io
+        run: |
+          sonar-scanner \
+          -Dsonar.projectKey=johanesrendy_bigdashboard_pso \
+          -Dsonar.organization=big-dashboard-pso \
+          -Dsonar.sources=. \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.automaticAnalysis.disabled=true
 
       - name: Check SonarCloud Quality Gate
-        id: quality-gate
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           STATUS=$(curl -s -u "${SONAR_TOKEN}:" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=johanesrendy_bigdashboard_pso" | jq -r '.projectStatus.status')
-          echo "SonarCloud Quality Gate Status: $STATUS"
           if [[ "$STATUS" != "OK" ]]; then
             echo "❌ Quality Gate Failed!"
             exit 1
@@ -56,7 +54,6 @@ jobs:
 
   merge-to-production:
     needs: sonarcloud-analysis
-    if: success()
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
