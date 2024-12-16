@@ -20,28 +20,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Pastikan semua riwayat tersedia
 
-      - name: Install SonarScanner CLI
-        run: |
-          wget -q -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
-          unzip sonar-scanner.zip
-          sudo mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner
-          echo "export PATH=$PATH:/opt/sonar-scanner/bin" >> $GITHUB_ENV
-          echo "SonarScanner CLI Installed Successfully"
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
 
-      - name: Verify SonarScanner Installation
-        run: sonar-scanner --version
-
-      - name: Run SonarCloud Analysis
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: .
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          sonar-scanner \
-            -Dsonar.projectKey=johanesrendy_bigdashboard_pso \
-            -Dsonar.organization=big-dashboard-pso \
-            -Dsonar.sources=. \
-            -Dsonar.host.url=https://sonarcloud.io
+          SONAR_PROJECT_KEY: johanesrendy_bigdashboard_pso
+          SONAR_ORG: big-dashboard-pso
 
       - name: Check SonarCloud Quality Gate
         env:
