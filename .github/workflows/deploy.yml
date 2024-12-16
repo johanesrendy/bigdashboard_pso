@@ -74,7 +74,7 @@ jobs:
 
             # Docker: Bring down the current containers and rebuild them
             sudo docker-compose --env-file .env down
-            docker builder prune -af
+            sudo docker builder prune -af
             sudo docker compose --env-file .env build --no-cache --pull
             sudo docker compose --env-file .env up -d 
 
