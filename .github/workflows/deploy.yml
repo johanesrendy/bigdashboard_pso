@@ -77,11 +77,13 @@ jobs:
             # Docker: Bring down the current containers and rebuild them
             sudo docker-compose --env-file .env down
             sudo docker compose --env-file .env build 
+            sudo docker compose --env-file .env up -d 
 
             #remove public hot
-            sudo rm -r public/hot
-
-            sudo docker compose --env-file .env up -d 
+            sudo docker exec -it npm bash
+            cd public
+            rm -rf hot
+            exit
 
             # Show logs for debugging
             echo "log laravel"
