@@ -11,7 +11,7 @@ on:
 
 permissions:
   pull-requests: write
-  contents: write  # Diperlukan untuk merge otomatis
+  contents: write
 
 jobs:
   sonarcloud-analysis:
@@ -20,13 +20,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Pastikan semua riwayat tersedia
+          fetch-depth: 0
 
-      - name: Set up JDK 17
+      - name: Set up Java 17
         uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: 'zulu'
+
+      - name: Verify Java Version
+        run: java -version
 
       - name: Install SonarScanner CLI
         run: |
@@ -34,9 +37,6 @@ jobs:
           unzip sonar-scanner.zip
           sudo mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner
           sudo ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/bin/sonar-scanner
-
-      - name: Verify Java Version
-        run: java -version
 
       - name: Verify SonarScanner Installation
         run: sonar-scanner --version
@@ -62,3 +62,21 @@ jobs:
           else
             echo "✅ Quality Gate Passed!"
           fi
+
+  merge-to-production:
+    needs: sonarcloud-analysis
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Merge Staging to Production
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git checkout production
+          git merge --no-ff staging -m "Auto-merge staging to production after successful Quality Gate"
+          git push origin production
