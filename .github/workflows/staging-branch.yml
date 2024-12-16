@@ -27,7 +27,7 @@ jobs:
           wget -q -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
           unzip sonar-scanner.zip
           mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner
-          export PATH="/opt/sonar-scanner/bin:$PATH"
+          echo "export PATH=/opt/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
 
       - name: Run SonarCloud Analysis
         env:
@@ -35,7 +35,7 @@ jobs:
         run: |
           sonar-scanner \
           -Dsonar.projectKey=johanesrendy_bigdashboard_pso \
-          -Dsonar.organization=<YOUR_ORG> \
+          -Dsonar.organization=big-dashboard-pso \
           -Dsonar.sources=. \
           -Dsonar.host.url=https://sonarcloud.io
 
