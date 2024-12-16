@@ -38,10 +38,12 @@ jobs:
           SONAR_ORG: big-dashboard-pso
 
       - name: Check SonarCloud Quality Gate
+        id: quality-gate
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           STATUS=$(curl -s -u "${SONAR_TOKEN}:" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=johanesrendy_bigdashboard_pso" | jq -r '.projectStatus.status')
+          echo "SonarCloud Quality Gate Status: $STATUS"
           if [[ "$STATUS" != "OK" ]]; then
             echo "❌ Quality Gate Failed!"
             exit 1
@@ -49,22 +51,10 @@ jobs:
             echo "✅ Quality Gate Passed!"
           fi
 
-  auto-merge:
-    needs: sonarcloud-analysis
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Enable Auto-Merge
-        uses: peter-evans/enable-pull-request-automerge@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          pull-request-number: ${{ github.event.pull_request.number }}
-          merge-method: squash
-
   merge-to-production:
     needs: sonarcloud-analysis
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    if: success()  # Lanjut hanya jika Quality Gate PASS
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
