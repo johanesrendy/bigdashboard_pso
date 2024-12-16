@@ -1,50 +1,92 @@
-name: Quality Gate and Merge to Production
+name: Deploy to Production
 
 on:
   push:
     branches:
-      - staging
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches:
-      - staging
+      - dev  # Deploy langsung dari branch dev ke production server
 
 permissions:
-  pull-requests: write
-  contents: write
+  contents: read
 
 jobs:
-  quality-gate-check:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      # Checkout Kode dari Repositori
+      - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Mendapatkan riwayat Git lengkap
 
-      - name: Check SonarCloud Quality Gate
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          STATUS=$(curl -s -u "${SONAR_TOKEN}:" \
-            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=johanesrendy_bigdashboard_pso" \
-            | jq -r '.projectStatus.status')
-          if [[ "$STATUS" != "OK" ]]; then
-            echo "❌ Quality Gate Failed!"
-            exit 1
-          else
-            echo "✅ Quality Gate Passed!"
-          fi
+      # Set Up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-  merge-to-production:
-    needs: quality-gate-check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      # Login ke Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Merge Staging to Production
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git checkout production
-          git merge --no-ff staging -m "Merging staging to production after successful Quality Gate"
-          git push origin production
+      # Build dan Push Docker Images
+      - name: Build and push app image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Docker/dockerfile/app.Dockerfile
+          push: true
+          tags: johanesrendy/laravel:${{ github.run_number }}
+
+      - name: Build and push nginx image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Docker/dockerfile/nginx.Dockerfile
+          push: true
+          tags: johanesrendy/laravel-nginx:${{ github.run_number }}
+
+      - name: Build and push npm image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Docker/dockerfile/npm.Dockerfile
+          push: true
+          tags: johanesrendy/laravel-npm:${{ github.run_number }}
+
+      # Deploy ke Production Server Menggunakan SSH
+      - name: Deploy to Production Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: "3.106.237.6"
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            echo "=== Pulling Latest Changes ==="
+            cd ~/bigdashboard_pso
+            git checkout dev
+            git pull origin dev || { echo "❌ Failed to pull changes"; exit 1; }
+
+            echo "=== Updating IMAGE_VER in .env ==="
+            sed -i '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
+
+            echo "=== Restarting Nginx ==="
+            sudo nginx -t && sudo service nginx restart || { echo "❌ Nginx failed to restart"; exit 1; }
+
+            echo "=== Installing Composer Dependencies ==="
+            composer install --no-interaction --prefer-dist
+
+            echo "=== Rebuilding Docker Containers ==="
+            sudo docker-compose --env-file .env down || { echo "❌ Failed to stop containers"; exit 1; }
+            sudo docker-compose --env-file .env up -d --build || { echo "❌ Failed to build/start containers"; exit 1; }
+
+            echo "=== Checking Docker Logs ==="
+            echo "Laravel Logs:"
+            sudo docker logs laravel || echo "No Laravel logs available."
+            echo "Nginx Logs:"
+            sudo docker logs nginx || echo "No Nginx logs available."
+            echo "NPM Logs:"
+            sudo docker logs npm || echo "No NPM logs available."
+
+            echo "✅ Deployment Completed Successfully!"
