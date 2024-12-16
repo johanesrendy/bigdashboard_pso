@@ -57,7 +57,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ~/bigdashboard_pso
-            git checkout staging  # Pastikan kita menarik kode dari branch staging, bukan dev
+            git checkout -b production
 
             # Update IMAGE_VER in .env
             sed -i '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
@@ -67,19 +67,15 @@ jobs:
             sudo service nginx restart
             sudo systemctl status nginx
 
-            git pull origin staging  # Pastikan kode yang di-pull adalah dari branch staging
+            git pull origin production
 
             # Install Composer dependencies
             composer i
 
             # Docker: Bring down the current containers and rebuild them
             sudo docker-compose --env-file .env down
-            sudo docker compose --env-file .env build 
-
-            # Remove public hot
-            sudo rm -r public/hot
-
-            sudo docker compose --env-file .env up -d 
+            sudo docker compose --env-file .env build
+            sudo docker compose --env-file .env up -d
 
             # Show logs for debugging
             echo "log laravel"
