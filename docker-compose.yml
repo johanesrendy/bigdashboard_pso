@@ -38,8 +38,7 @@ services:
         working_dir: /var/www
         networks:
             - laravel-net
-        command: >
-            sh -c "sudo rm -rf /var/www/public/hot && npm run dev"
+        command: ["npm", "run", "build"]
 
 # Docker Networks
 networks:
