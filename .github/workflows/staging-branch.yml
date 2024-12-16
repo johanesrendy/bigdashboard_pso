@@ -1,4 +1,4 @@
-name: SonarCloud Analysis and Merge
+name: SonarCloud Analysis and Merge to Production
 
 on:
   push:
@@ -28,7 +28,6 @@ jobs:
           unzip sonar-scanner.zip
           sudo mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner
           sudo ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/bin/sonar-scanner
-          echo "SonarScanner CLI installed successfully!"
 
       - name: Verify SonarScanner Installation
         run: sonar-scanner --version
@@ -54,3 +53,33 @@ jobs:
           else
             echo "✅ Quality Gate Passed!"
           fi
+
+  auto-merge:
+    needs: sonarcloud-analysis
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable Auto-Merge
+        uses: peter-evans/enable-pull-request-automerge@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ github.event.pull_request.number }}
+          merge-method: squash
+
+  merge-to-production:
+    needs: sonarcloud-analysis
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Merge Staging to Production
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git checkout production
+          git merge --no-ff staging -m "Auto-merge staging to production after successful Quality Gate"
+          git push origin production
