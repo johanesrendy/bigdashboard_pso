@@ -38,7 +38,12 @@ services:
         working_dir: /var/www
         networks:
             - laravel-net
-        command: ["npm", "run", "build"]
+        command:
+            [
+                "sh",
+                "-c",
+                "npm run dev & sleep 5 && rm -rf public/hot && tail -f /dev/null",
+            ]
 
 # Docker Networks
 networks:

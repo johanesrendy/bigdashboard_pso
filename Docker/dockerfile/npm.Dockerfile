@@ -20,4 +20,4 @@ RUN npm i --legacy-peer-deps
 COPY . .
 
 # Menjalankan frontend build
-CMD ["npm", "run", "build"]
+CMD ["npm", "run", "dev"]
