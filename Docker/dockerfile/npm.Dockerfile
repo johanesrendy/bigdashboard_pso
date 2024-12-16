@@ -16,11 +16,11 @@ RUN rm -rf node_modules package-lock.json
 # Install dependencies
 RUN npm i --legacy-peer-deps
 
-# Copy seluruh source code aplikasi ke dalam container
-COPY . .
-
 # Hapus public/hot
 RUN rm -rf /var/www/public/hot
+
+# Copy seluruh source code aplikasi ke dalam container
+COPY . .
 
 # Menjalankan frontend build
 CMD ["npm", "run", "dev"]
