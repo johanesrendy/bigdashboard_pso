@@ -19,8 +19,19 @@ RUN npm i --legacy-peer-deps
 # Copy seluruh source code aplikasi ke dalam container
 COPY . .
 
-# Hapus public/hot
-RUN rm -rf /var/www/public/hot
+# Hapus folder public/hot jika ada
+RUN if [ -d "/var/www/public/hot" ]; then \
+      echo "Hapus folder /var/www/public/hot"; \
+      rm -rf /var/www/public/hot; \
+    fi
+
+# Verifikasi penghapusan
+RUN if [ ! -d "/var/www/public/hot" ]; then \
+      echo "Folder hot berhasil dihapus"; \
+    else \
+      echo "Gagal menghapus folder hot"; \
+      exit 1; \
+    fi
 
 # Menjalankan frontend build
 CMD ["npm", "run", "dev"]
