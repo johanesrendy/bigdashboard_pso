@@ -26,20 +26,21 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 17
-          distribution: 'zulu'
+          distribution: 'temurin'  # Gunakan distribusi Temurin untuk Java 17
 
       - name: Verify Java Version
-        run: java -version
+        run: java -version  # Validasi versi Java
+
+      - name: Clean Cache
+        run: sudo rm -rf ~/.sonar/cache  # Membersihkan cache untuk mencegah konflik
 
       - name: Install SonarScanner CLI
         run: |
           wget -q -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
           unzip sonar-scanner.zip
-          sudo mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner
-          sudo ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/bin/sonar-scanner
-
-      - name: Verify SonarScanner Installation
-        run: sonar-scanner --version
+          mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner
+          echo "export PATH=\"/opt/sonar-scanner/bin:\$PATH\"" >> $GITHUB_ENV
+          echo "export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
 
       - name: Run SonarCloud Analysis
         env:
@@ -49,7 +50,8 @@ jobs:
           -Dsonar.projectKey=johanesrendy_bigdashboard_pso \
           -Dsonar.organization=big-dashboard-pso \
           -Dsonar.sources=. \
-          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.host.url=https://sonarcloud.io \
+          -X  # Debugging mode
 
       - name: Check SonarCloud Quality Gate
         env:
@@ -62,6 +64,18 @@ jobs:
           else
             echo "✅ Quality Gate Passed!"
           fi
+
+  auto-merge:
+    needs: sonarcloud-analysis
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable Auto-Merge
+        uses: peter-evans/enable-pull-request-automerge@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ github.event.pull_request.number }}
+          merge-method: squash
 
   merge-to-production:
     needs: sonarcloud-analysis
