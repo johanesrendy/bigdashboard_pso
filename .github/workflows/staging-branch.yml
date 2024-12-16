@@ -20,7 +20,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Pastikan semua riwayat tersedia
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -29,13 +29,16 @@ jobs:
           distribution: 'zulu'
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        with:
-          projectBaseDir: .
+        uses: SonarSource/sonarqube-scan-action@v4.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: johanesrendy_bigdashboard_pso
-          SONAR_ORG: big-dashboard-pso
+        with:
+          projectBaseDir: .
+          args: >
+            -Dsonar.projectKey=johanesrendy_bigdashboard_pso
+            -Dsonar.organization=big-dashboard-pso
+            -Dsonar.sources=.
+            -Dsonar.host.url=https://sonarcloud.io
 
       - name: Check SonarCloud Quality Gate
         id: quality-gate
@@ -53,8 +56,8 @@ jobs:
 
   merge-to-production:
     needs: sonarcloud-analysis
+    if: success()
     runs-on: ubuntu-latest
-    if: success()  # Lanjut hanya jika Quality Gate PASS
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
