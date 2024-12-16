@@ -3,58 +3,18 @@ name: Deploy to Production
 on:
   push:
     branches:
-      - dev  # Deploy langsung dari branch dev ke production server
+      - production  # Trigger hanya saat ada push ke production
 
 permissions:
   contents: read
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      # Checkout Kode dari Repositori
-      - name: Checkout Code
+      - name: Checkout Production Code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Mendapatkan riwayat Git lengkap
 
-      # Set Up Docker Buildx
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      # Login ke Docker Hub
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      # Build dan Push Docker Images
-      - name: Build and push app image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Docker/dockerfile/app.Dockerfile
-          push: true
-          tags: johanesrendy/laravel:${{ github.run_number }}
-
-      - name: Build and push nginx image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Docker/dockerfile/nginx.Dockerfile
-          push: true
-          tags: johanesrendy/laravel-nginx:${{ github.run_number }}
-
-      - name: Build and push npm image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Docker/dockerfile/npm.Dockerfile
-          push: true
-          tags: johanesrendy/laravel-npm:${{ github.run_number }}
-
-      # Deploy ke Production Server Menggunakan SSH
       - name: Deploy to Production Server
         uses: appleboy/ssh-action@master
         with:
@@ -65,28 +25,19 @@ jobs:
           script: |
             echo "=== Pulling Latest Changes ==="
             cd ~/bigdashboard_pso
-            git checkout dev
-            git pull origin dev || { echo "❌ Failed to pull changes"; exit 1; }
+            git checkout production
+            git pull origin production
 
             echo "=== Updating IMAGE_VER in .env ==="
             sed -i '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
 
             echo "=== Restarting Nginx ==="
-            sudo nginx -t && sudo service nginx restart || { echo "❌ Nginx failed to restart"; exit 1; }
-
-            echo "=== Installing Composer Dependencies ==="
-            composer install --no-interaction --prefer-dist
+            sudo nginx -t
+            sudo service nginx restart
 
             echo "=== Rebuilding Docker Containers ==="
-            sudo docker-compose --env-file .env down || { echo "❌ Failed to stop containers"; exit 1; }
-            sudo docker-compose --env-file .env up -d --build || { echo "❌ Failed to build/start containers"; exit 1; }
-
-            echo "=== Checking Docker Logs ==="
-            echo "Laravel Logs:"
-            sudo docker logs laravel || echo "No Laravel logs available."
-            echo "Nginx Logs:"
-            sudo docker logs nginx || echo "No Nginx logs available."
-            echo "NPM Logs:"
-            sudo docker logs npm || echo "No NPM logs available."
+            composer install
+            sudo docker-compose --env-file .env down
+            sudo docker-compose --env-file .env up -d --build
 
             echo "✅ Deployment Completed Successfully!"
