@@ -11,6 +11,7 @@ on:
 
 permissions:
   pull-requests: write
+  contents: write  # Diperlukan untuk melakukan merge ke production
 
 jobs:
   build-and-analyze:
@@ -18,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Fetch all history for full analysis
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -26,19 +27,19 @@ jobs:
           java-version: 17
           distribution: 'zulu'
 
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+      - name: Install jq
+        run: sudo apt-get install jq
 
-      - name: Cache Gradle packages
+      - name: Cache SonarCloud and Gradle packages
         uses: actions/cache@v3
         with:
-          path: ~/.gradle/caches
+          path: |
+            ~/.sonar/cache
+            ~/.gradle/caches
+            ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       - name: Build and analyze with SonarCloud
         env:
@@ -50,7 +51,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          STATUS=$(curl -s -u "${SONAR_TOKEN}:" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=<YOUR_PROJECT_KEY>" | jq -r '.projectStatus.status')
+          STATUS=$(curl -s -u "${SONAR_TOKEN}:" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=johanesrendy_bigdashboard_pso" | jq -r '.projectStatus.status')
           if [[ "$STATUS" != "OK" ]]; then
             echo "Quality Gate Failed!"
             exit 1
@@ -58,6 +59,7 @@ jobs:
 
   auto-merge:
     needs: build-and-analyze
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Enable Auto-Merge
@@ -66,3 +68,21 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           pull-request-number: ${{ github.event.pull_request.number }}
           merge-method: squash
+
+  merge-to-production:
+    needs: build-and-analyze
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Merge staging to production
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git checkout production
+          git merge --no-ff staging -m "Auto-merge staging to production after successful Quality Gate"
+          git push origin production
