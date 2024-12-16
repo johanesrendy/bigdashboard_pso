@@ -2,7 +2,10 @@ name: Deploy Application
 
 on:
   push:
-    branches: ["staging"]  # Trigger deploy ke production hanya setelah staging
+    branches: ["production"]  # Trigger workflow hanya saat ada push ke production branch
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -57,7 +60,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ~/bigdashboard_pso
-            git checkout -b production
+            git checkout production
 
             # Update IMAGE_VER in .env
             sed -i '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
@@ -78,9 +81,9 @@ jobs:
             sudo docker compose --env-file .env up -d
 
             # Show logs for debugging
-            echo "log laravel"
+            echo "Log Laravel"
             sudo docker logs laravel
-            echo "log nginx"
+            echo "Log Nginx"
             sudo docker logs nginx
-            echo "log npm"
+            echo "Log NPM"
             sudo docker logs npm
