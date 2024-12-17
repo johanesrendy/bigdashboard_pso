@@ -79,6 +79,11 @@ jobs:
       - name: 🛎 Checkout Code
         uses: actions/checkout@v3
 
+      - name: Ensure Base Branch Checkout
+        run: |
+          git fetch origin production
+          git checkout production
+
       - name: 📋 Create Pull Request to Production
         uses: peter-evans/create-pull-request@v7
         with:
