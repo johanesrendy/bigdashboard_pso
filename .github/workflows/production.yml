@@ -50,7 +50,7 @@ jobs:
             sudo nginx -t
             sudo service nginx restart
 
-            echo "=== Rebuilding Docker Containers ===
+            echo "=== Rebuilding Docker Containers ==="
             sudo docker-compose --env-file .env down
             sudo docker-compose --env-file .env up -d --build
 
