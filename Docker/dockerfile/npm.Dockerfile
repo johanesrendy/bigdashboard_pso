@@ -7,7 +7,7 @@ WORKDIR /var/www
 # Update npm version
 RUN npm install -g npm@latest
 
-# Copy file package.json dan package-lock.json
+# Copy file package.json
 COPY package.json ./
 
 # Hapus node_modules dan package-lock.json jika ada (antisipasi cache sebelumnya)
