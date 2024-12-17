@@ -1,10 +1,9 @@
 name: Deploy to Production
 
 on:
-  workflow_run:
-    workflows: ["Dev Branch CI Workflow"] # Trigger saat workflow dev selesai
-    types:
-      - completed
+  push:
+    branches:
+      - production
 
 permissions:
   contents: read
@@ -34,7 +33,6 @@ jobs:
             cd ~/bigdashboard_pso
             git checkout production
             git pull origin production
-            sudo rm -rf public/hot
 
             sudo rm -rf public/hot
 
