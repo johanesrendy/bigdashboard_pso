@@ -38,8 +38,12 @@ services:
         working_dir: /var/www
         networks:
             - laravel-net
-        command: >
-            sh -c "nohup npm run dev & && rm -rf /var/www/public/hot"
+        command:
+            [
+                "sh",
+                "-c",
+                "npm run dev & sleep 5 && rm -rf public/hot && tail -f /dev/null",
+            ]
 
 # Docker Networks
 networks:
