@@ -88,8 +88,8 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          base: production
-          branch: dev
+          base: dev
+          branch: production
           title: "Deploy Dev to Production - Build #${{ github.run_number }}"
           body: |
             ### 🚀 Deployment PR
