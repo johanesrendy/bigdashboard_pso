@@ -1,0 +1,29 @@
+{
+  "_axios-upsvKRUO.js": {
+    "file": "assets/axios-upsvKRUO.js",
+    "name": "axios"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-CnW1--27.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-DeQrA2Ni.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_axios-upsvKRUO.js"
+    ]
+  },
+  "resources/js/bootstrap.js": {
+    "file": "assets/bootstrap-DeQrA2Ni.js",
+    "name": "bootstrap",
+    "src": "resources/js/bootstrap.js",
+    "isEntry": true,
+    "imports": [
+      "_axios-upsvKRUO.js"
+    ]
+  }
+}
