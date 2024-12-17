@@ -1,9 +1,10 @@
 name: Deploy to Production
 
 on:
-  push:
-    branches:
-      - production
+  workflow_run:
+    workflows: ["Dev Branch CI Workflow"] # Trigger saat workflow dev selesai
+    types:
+      - completed
 
 permissions:
   contents: read
