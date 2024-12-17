@@ -2,49 +2,40 @@ name: Deploy to Production
 
 on:
   workflow_run:
-    workflows: ["Dev Branch CI Workflow"]
+    workflows: ["Dev Branch CI Workflow"] # Trigger saat workflow dev selesai
     types:
       - completed
 
 permissions:
   contents: read
-  actions: read
 
 jobs:
   deploy:
     name: 🚀 Deploy to Production
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
+    if: >
+      github.event_name == 'push' || 
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     steps:
-      - name: 📥 Download Run Number Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: run-number
-          path: run_number.txt
-
-      - name: 🔍 Read Run Number
-        id: run_number
-        run: echo "RUN_NUMBER=$(cat run_number.txt)" >> $GITHUB_ENV
       - name: 🛎 Checkout Production Code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
+      - name: 🚀 Set Modified Run Number
+        id: set_run_number
+        run: |
+          # Menambah 8 pada github.run_number
+          MODIFIED_RUN_NUMBER=$((github.run_number + 8))
+          echo "Modified Run Number: $MODIFIED_RUN_NUMBER"
+          echo "MODIFIED_RUN_NUMBER=$MODIFIED_RUN_NUMBER" >> $GITHUB_ENV
+
       - name: 🚀 Pull Latest Docker Images
         run: |
           echo "=== Pulling Latest Docker Images ==="
-          TAG=${{ env.RUN_NUMBER }}
-          echo "Using Image Tag: $TAG"
-
-          # Validate Docker Images
-          if ! sudo docker manifest inspect johanesrendy/laravel:$TAG > /dev/null; then
-            echo "Error: Docker image johanesrendy/laravel:$TAG not found!"
-            exit 1
-          fi
-
-          sudo docker pull johanesrendy/laravel:$TAG
-          sudo docker pull johanesrendy/laravel-nginx:$TAG
-          sudo docker pull johanesrendy/laravel-npm:$TAG
+          sudo docker pull johanesrendy/laravel:${{ env.MODIFIED_RUN_NUMBER }}
+          sudo docker pull johanesrendy/laravel-nginx:${{ env.MODIFIED_RUN_NUMBER }}
+          sudo docker pull johanesrendy/laravel-npm:${{ env.MODIFIED_RUN_NUMBER }}
 
       - name: 🚀 Deploy to Production Server
         uses: appleboy/ssh-action@master
@@ -54,25 +45,25 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            set -e
-
             echo "=== Pulling Latest Changes ==="
             cd ~/bigdashboard_pso
             git checkout production
             git pull origin production
-            composer install --no-interaction --prefer-dist --optimize-autoloader
+            composer install
 
             echo "=== Deleting hot ==="
             cd public
             sudo rm -rf hot
+            ls
             cd ..
             echo "=== Deleting hot success ==="
 
             echo "=== Updating IMAGE_VER in .env ==="
-            sed -i '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
+            sed -i '$d' .env && echo "IMAGE_VER=${{ env.MODIFIED_RUN_NUMBER }}" >> .env
 
             echo "=== Restarting Nginx ==="
-            sudo nginx -t && sudo service nginx restart
+            sudo nginx -t
+            sudo service nginx restart
 
             echo "=== Rebuilding Docker Containers ==="
             sudo docker-compose --env-file .env down
