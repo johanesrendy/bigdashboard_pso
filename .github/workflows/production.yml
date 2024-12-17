@@ -1,11 +1,8 @@
 name: Deploy to Production
 
 on:
-  push:
-    branches:
-      - dev  # Trigger saat ada push ke branch dev
   workflow_run:
-    workflows: ["Dev Branch CI Workflow"]  # Trigger saat workflow dev selesai
+    workflows: ["Dev Branch CI Workflow"] # Trigger saat workflow dev selesai
     types:
       - completed
 
