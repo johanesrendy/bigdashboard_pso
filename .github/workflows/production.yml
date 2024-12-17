@@ -2,20 +2,19 @@ name: Deploy to Production
 
 on:
   workflow_run:
-    workflows: ["Dev Branch CI Workflow"] # Trigger saat workflow dev selesai
+    workflows: ["Dev Branch CI Workflow"]
     types:
       - completed
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   deploy:
     name: 🚀 Deploy to Production
     runs-on: ubuntu-latest
-    if: >
-      github.event_name == 'push' || 
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    if: github.event.workflow_run.conclusion == 'success'
     steps:
       - name: 🛎 Checkout Production Code
         uses: actions/checkout@v3
@@ -25,9 +24,18 @@ jobs:
       - name: 🚀 Pull Latest Docker Images
         run: |
           echo "=== Pulling Latest Docker Images ==="
-          sudo docker pull johanesrendy/laravel:${{ github.run_number }}
-          sudo docker pull johanesrendy/laravel-nginx:${{ github.run_number }}
-          sudo docker pull johanesrendy/laravel-npm:${{ github.run_number }}
+          TAG=${{ github.run_number }}
+          echo "Using Image Tag: $TAG"
+          
+          # Validate Docker Images
+          if ! sudo docker manifest inspect johanesrendy/laravel:$TAG > /dev/null; then
+            echo "Error: Docker image johanesrendy/laravel:$TAG not found!"
+            exit 1
+          fi
+
+          sudo docker pull johanesrendy/laravel:$TAG
+          sudo docker pull johanesrendy/laravel-nginx:$TAG
+          sudo docker pull johanesrendy/laravel-npm:$TAG
 
       - name: 🚀 Deploy to Production Server
         uses: appleboy/ssh-action@master
@@ -37,16 +45,17 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
+            set -e
+
             echo "=== Pulling Latest Changes ==="
             cd ~/bigdashboard_pso
             git checkout production
             git pull origin production
-            composer install
+            composer install --no-interaction --prefer-dist --optimize-autoloader
 
             echo "=== Deleting hot ==="
             cd public
             sudo rm -rf hot
-            ls
             cd ..
             echo "=== Deleting hot success ==="
 
@@ -54,8 +63,7 @@ jobs:
             sed -i '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
 
             echo "=== Restarting Nginx ==="
-            sudo nginx -t
-            sudo service nginx restart
+            sudo nginx -t && sudo service nginx restart
 
             echo "=== Rebuilding Docker Containers ==="
             sudo docker-compose --env-file .env down
