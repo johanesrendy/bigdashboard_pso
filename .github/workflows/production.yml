@@ -22,21 +22,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 🚀 Set Modified Run Number
-        id: set_run_number
-        run: |
-          # Menambah 8 pada github.run_number
-          MODIFIED_RUN_NUMBER=$((github.run_number + 8))
-          echo "Modified Run Number: $MODIFIED_RUN_NUMBER"
-          echo "MODIFIED_RUN_NUMBER=$MODIFIED_RUN_NUMBER" >> $GITHUB_ENV
-
-      - name: 🚀 Pull Latest Docker Images
-        run: |
-          echo "=== Pulling Latest Docker Images ==="
-          sudo docker pull johanesrendy/laravel:${{ env.MODIFIED_RUN_NUMBER }}
-          sudo docker pull johanesrendy/laravel-nginx:${{ env.MODIFIED_RUN_NUMBER }}
-          sudo docker pull johanesrendy/laravel-npm:${{ env.MODIFIED_RUN_NUMBER }}
-
       - name: 🚀 Deploy to Production Server
         uses: appleboy/ssh-action@master
         with:
