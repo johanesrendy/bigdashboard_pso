@@ -25,7 +25,7 @@ jobs:
       - name: 🚀 Pull Latest Docker Images
         run: |
           echo "=== Pulling Latest Docker Images ==="
-          sudo docker pull johanesrendy/laravel:
+          sudo docker pull johanesrendy/laravel:51
           sudo docker pull johanesrendy/laravel-nginx:51
           sudo docker pull johanesrendy/laravel-npm:51
 
