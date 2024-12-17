@@ -17,21 +17,21 @@ jobs:
       github.event_name == 'push' || 
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     steps:
-      # Checkout Kode Produksi
+      # Checkout kode terbaru dari branch production
       - name: 🛎 Checkout Production Code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      # Tarik Docker Image Terbaru
+      # Pull Docker Images terbaru
       - name: 🚀 Pull Latest Docker Images
         run: |
           echo "=== Pulling Latest Docker Images ==="
-          docker pull johanesrendy/laravel:${{ github.run_number }} || echo "Laravel image not found"
-          docker pull johanesrendy/laravel-nginx:${{ github.run_number }} || echo "Nginx image not found"
-          docker pull johanesrendy/laravel-npm:${{ github.run_number }} || echo "NPM image not found"
+          sudo docker pull johanesrendy/laravel:${{ github.run_number }}
+          sudo docker pull johanesrendy/laravel-nginx:${{ github.run_number }}
+          sudo docker pull johanesrendy/laravel-npm:${{ github.run_number }}
 
-      # Deploy ke Server Production
+      # Deploy ke Production Server
       - name: 🚀 Deploy to Production Server
         uses: appleboy/ssh-action@master
         with:
@@ -44,14 +44,22 @@ jobs:
             cd ~/bigdashboard_pso
             git checkout production
             git pull origin production
-
-            echo "=== Installing Dependencies ==="
+            
+            echo "=== Running Composer Install ==="
             composer install --no-dev --optimize-autoloader
 
-            echo "=== Running NPM Build ==="
-            rm -rf public/build  # Bersihkan folder build lama
-            npm install
+            echo "=== Installing Node Dependencies ==="
+            npm install --omit=dev
+
+            echo "=== Building Frontend Assets ==="
             npm run build
+
+            echo "=== Deleting hot ==="
+            cd public
+            sudo rm -rf hot
+            ls
+            cd ..
+            echo "=== Deleting hot success ==="
 
             echo "=== Updating IMAGE_VER in .env ==="
             sed -i '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
