@@ -1,5 +1,5 @@
 # Gunakan image node.js sebagai dasar
-FROM node:18-bullseye
+FROM node:20-bullseye
 
 # Set working directory
 WORKDIR /var/www
