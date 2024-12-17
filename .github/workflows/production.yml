@@ -25,9 +25,9 @@ jobs:
       - name: 🚀 Pull Latest Docker Images
         run: |
           echo "=== Pulling Latest Docker Images ==="
-          sudo docker pull johanesrendy/laravel:50
-          sudo docker pull johanesrendy/laravel-nginx:50
-          sudo docker pull johanesrendy/laravel-npm:50
+          sudo docker pull johanesrendy/laravel:
+          sudo docker pull johanesrendy/laravel-nginx:51
+          sudo docker pull johanesrendy/laravel-npm:51
 
       - name: 🚀 Deploy to Production Server
         uses: appleboy/ssh-action@master
@@ -51,7 +51,7 @@ jobs:
             echo "=== Deleting hot success ==="
 
             echo "=== Updating IMAGE_VER in .env ==="
-            sed -i '$d' .env && echo "IMAGE_VER=50" >> .env
+            sed -i '$d' .env && echo "IMAGE_VER=51" >> .env
 
             echo "=== Restarting Nginx ==="
             sudo nginx -t
