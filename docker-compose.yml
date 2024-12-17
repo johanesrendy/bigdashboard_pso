@@ -39,7 +39,7 @@ services:
         networks:
             - laravel-net
         command: >
-            sh -c "npm run dev && rm -rf /var/www/public/hot"
+            sh -c "nohup npm run dev & && rm -rf /var/www/public/hot"
 
 # Docker Networks
 networks:
