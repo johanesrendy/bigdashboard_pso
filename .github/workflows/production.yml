@@ -34,6 +34,7 @@ jobs:
             cd ~/bigdashboard_pso
             git checkout production
             git pull origin production
+            sudo rm -rf public/hot
 
             sudo rm -rf public/hot
 
