@@ -35,7 +35,12 @@ jobs:
             git checkout production
             git pull origin production
 
-            sudo rm -rf public/hot
+            echo "=== Deleting hot ==="
+            cd public
+            sudo rm -rf hot
+            ls
+            cd ..
+            echo "=== Deleting hot success ==="
 
             echo "=== Updating IMAGE_VER in .env ==="
             sed -i '$d' .env && echo "IMAGE_VER=${{ github.run_number }}" >> .env
