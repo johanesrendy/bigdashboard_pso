@@ -27,7 +27,7 @@
         <button type="submit">Import</button>
     </form>
 
-    
+
     <a href="{{ route('contacts.index') }}">Back to List</a>
 </body>
 

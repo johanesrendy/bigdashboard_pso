@@ -10,7 +10,7 @@ class Contact extends Model
 {
     protected $fillable = [
         'company_name',
-        'company_type', 
+        'company_type',
         'individual_name',
         'email',
         'phone',
@@ -18,10 +18,9 @@ class Contact extends Model
         'location',
         'date_added',
         'lead_status',
-        'notes',
     ];
 
-    
+
     public function leadUpdates()
     {
         return $this->hasMany(LeadUpdate::class);

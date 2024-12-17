@@ -11,6 +11,7 @@ use App\Exports\ContactsExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
+
 class ContactController extends Controller
 {
 
@@ -50,7 +51,7 @@ class ContactController extends Controller
 
         // Filter untuk kontak yang tidak di-follow up lebih dari 7 hari
         if ($request->has('unfollowed') && $request->input('unfollowed') == 'true') {
-            $query->where('updated_at', '<=', now()->subDays(3)); // Kontak yang tidak ada perubahan status setelah 3 hari
+            $query->where('updated_at', '<=', now()->subDays(7)); // Kontak yang tidak ada perubahan status setelah 7 hari
         }
 
         // Mengambil data kontak dengan pagination
@@ -71,9 +72,7 @@ class ContactController extends Controller
 
         $logs = ActivityLog::with('user')->paginate(10);
 
-        return view('contacts.index', compact('contacts', 'totalLeads', 'hotLeads', 'warmLeads', 'coldLeads', 'newLeadsToday', 'userName', 'logs','role'));
-
-
+        return view('contacts.index', compact('contacts', 'totalLeads', 'hotLeads', 'warmLeads', 'coldLeads', 'newLeadsToday', 'userName', 'logs', 'role'));
     }
 
 
@@ -86,6 +85,17 @@ class ContactController extends Controller
     public function import()
     {
         return view('contacts.import');
+    }
+
+    public function deleteAll()
+    {
+
+
+        // Hapus semua data dari tabel contacts
+        Contact::query()->delete();
+
+        // Redirect dengan pesan sukses
+        return redirect()->route('contacts.index')->with('success', 'Semua data kontak dan data terkait berhasil dihapus.');
     }
 
     public function importPost(Request $request)
@@ -165,7 +175,7 @@ class ContactController extends Controller
     {
         $request->validate([
             'company_name' => 'required|string|max:255',
-            'company_type' => 'required|in:Government,Private,Non-profit,Startup,Other',
+            'company_type' => 'required|string|max:255',
             'individual_name' => 'required|string|max:255',
             'email' => 'required|email|unique:contacts,email',
             'phone' => 'required|string|max:20',
@@ -193,18 +203,25 @@ class ContactController extends Controller
     }
 
     // Menampilkan formulir untuk mengedit kontak
+    public function getContact($id)
+    {
+        $contact = Contact::findOrFail($id);
+        return response()->json($contact);
+    }
+
     public function editForm($id)
     {
         $contact = Contact::findOrFail($id);
-        return view('contacts.editForm', compact('contact'));
+        return response()->json($contact);
     }
+
 
     // Memperbarui kontak yang ada
     public function update(Request $request, $id)
     {
         $request->validate([
             'company_name' => 'required|string|max:255',
-            'company_type' => 'required|in:Government,Private,Non-profit,Startup,Other',
+            'company_type' => 'required|string|max:255',
             'individual_name' => 'required|string|max:255',
             'email' => 'required|email|unique:contacts,email,' . $id,
             'phone' => 'required|string|max:20',
@@ -256,7 +273,7 @@ class ContactController extends Controller
         // Simpan log aktivitas dengan detail
         $this->logActivity('Hapus Data', "{$contactDetails}", Auth::user()->id, Auth::user()->role);
 
-        return redirect()->route('contacts.index')->with('success', 'Contact deleted successfully.');
+        return redirect()->route('data.leads')->with('success', 'Contact deleted successfully.');
     }
 
     private function logActivity($activity, $details, $userId, $role)
@@ -267,8 +284,6 @@ class ContactController extends Controller
             'role' => $role,
             'details' => $details,
         ]);
-
-
     }
 
     // ContactController.php
@@ -290,8 +305,8 @@ class ContactController extends Controller
             'Ubah Status Lead',
 
             '  ID: ' . $contact->id .
-            ', Name: ' . $contact->individual_name .
-            ', Company: ' . $contact->company_name . ' status lead menjadi ' . $contact->lead_status,
+                ', Name: ' . $contact->individual_name .
+                ', Company: ' . $contact->company_name . ' status lead menjadi ' . $contact->lead_status,
             Auth::user()->id,
             Auth::user()->role
         );
@@ -301,6 +316,12 @@ class ContactController extends Controller
 
 
     // Fungsi untuk mendapatkan kontak yang belum ditindaklanjuti
+
+
+    public function lost_data()
+    {
+        return view('contacts.lostData');
+    }
 
     public function tracker(Request $request)
     {
@@ -412,17 +433,44 @@ class ContactController extends Controller
             'role' => $role,
         ]);
     }
-    public function lost_data()
-    {
-        return view('contacts.lostData');
+
+    public function getDataTracker()
+{
+    // Mengambil data contacts yang memiliki leadUpdates lebih dari 7 hari
+    $contacts = Contact::whereHas('leadUpdates', function ($query) {
+        $query->where('date_added', '<', now()->subDays(7)); // Mengambil data yang lebih dari 7 hari
+    })->paginate(10); // Menggunakan pagination untuk 10 data per halaman
+
+    return view('data-tracker', compact('contacts'));
+}
+
+public function activityLogs(Request $request)
+{
+    $query = ActivityLog::query()->with('user');
+
+    // Filter berdasarkan user ID
+    if ($request->filled('user_id')) {
+        $query->where('admin_id', $request->user_id);
     }
 
-    public function updateNotes(Request $request, $id)
-    {
-        $contact = Contact::findOrFail($id);
-        $contact->update(['notes' => $request->notes]);
-
-        return redirect()->back()->with('success', 'Notes updated successfully');
+    // Filter berdasarkan aktivitas
+    if ($request->filled('activity')) {
+        $query->where('activity', 'like', '%' . $request->activity . '%');
     }
+
+    // Filter berdasarkan rentang tanggal
+    if ($request->filled('from_date') && $request->filled('to_date')) {
+        $query->whereBetween('created_at', [$request->from_date, $request->to_date]);
+    }
+
+    // Pengurutan
+    $query->orderBy('created_at', 'desc');
+
+    // Pagination
+    $logs = $query->paginate(10);
+
+    return view('contacts.activityLogs', compact('logs'));
+}
+
 
 }

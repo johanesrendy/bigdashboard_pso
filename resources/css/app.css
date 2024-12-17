@@ -436,3 +436,9 @@ table tr {
     background: transparent; /* Untuk halaman tidak aktif */
     color: black; /* Warna teks halaman tidak aktif */
 }
+
+.stat-chart canvas {
+    height: auto; /* Biarkan tinggi otomatis */
+    width: 100% !important; /* Set width menjadi 50% dari kontainer */
+
+}

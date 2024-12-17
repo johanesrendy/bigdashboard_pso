@@ -3,7 +3,7 @@ namespace App\Imports;
 
 use App\Models\Contact;
 use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow; // Tambahkan interface ini
+use Maatwebsite\Excel\Concerns\WithHeadingRow; 
 
 class ContactsImport implements ToModel, WithHeadingRow
 {
@@ -23,7 +23,7 @@ class ContactsImport implements ToModel, WithHeadingRow
             'phone' => $row['phone'],
             'job_title' => $row['job_title'],
             'location' => $row['location'],
-            'date_added' => now(),   // Default value
+            'date_added' => now(),
             'lead_status' => 'Cold Leads'
         ]);
     }

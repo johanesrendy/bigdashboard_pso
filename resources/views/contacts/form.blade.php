@@ -13,17 +13,6 @@
         <input type="text" id="company_name" name="company_name" required>
         <br>
 
-        <label for="company_type">Company Type:</label>
-<select id="company_type" name="company_type" required>
-    <option value="Government">Government</option>
-    <option value="Private">Private</option>
-    <option value="Non-profit">Non-profit</option>
-    <option value="Startup">Startup</option>
-    <option value="Other">Other</option>
-</select>
-<br>
-
-
         <label for="individual_name">Individual Name:</label>
         <input type="text" id="individual_name" name="individual_name" required>
         <br>
@@ -50,7 +39,7 @@
 
 
         <button type="submit">Add Contact</button>
-
+        
     </form>
 </body>
 </html>

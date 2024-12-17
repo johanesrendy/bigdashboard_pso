@@ -56,11 +56,8 @@
 
 
     <div class="stat-section">
-        <!-- Title and Sort by Dropdown in one line -->
         <div class="stat-title-dropdown">
             <div class="stat-title">Statistik</div>
-
-            <!-- Sort by dropdown -->
             <div class="sort-by-dropdown">
                 <div class="dd-title">Urutkan berdasarkan</div>
                 <select id="sort-by" onchange="sortData()">
@@ -71,46 +68,15 @@
             </div>
         </div>
 
-        <!-- Stacked Bar Chart and Donut Chart -->
         <div class="stat-chart">
-            <!-- Stacked Bar Chart -->
             <div class="stacked-chart">
                 <h3>Pencapaian Leads <span id="stacked-timeframe">Harian</span></h3>
-                <div id="stacked-bar-chart"></div>
-                <div class="flex gap-4 mt-3">
-                    <div class="inline-flex items-center">
-                        <span class="w-4 h-4 block bg-[#0549CF] rounded-sm mr-2"></span>
-                        <span>Cold Leads</span>
-                    </div>
-                    <div class="inline-flex items-center">
-                        <span class="w-4 h-4 block bg-[#FF931E] rounded-sm mr-2"></span>
-                        <span>Warm Leads</span>
-                    </div>
-                    <div class="inline-flex items-center">
-                        <span class="w-4 h-4 block bg-[#F54A45] rounded-sm mr-2"></span>
-                        <span>Hot Leads</span>
-                    </div>
-                </div>
+                <canvas id="stacked-bar-chart" class="w-full h-20"></canvas>
             </div>
 
-            <!-- Donut Chart -->
             <div class="chart-donut">
                 <h3>Perbandingan Kategori Leads <span id="donut-timeframe">Harian</span></h3>
-                <div id="donut-chart"></div>
-                <div class="flex gap-4 mt-3">
-                    <div class="inline-flex items-center">
-                        <span class="w-4 h-4 block bg-[#0549CF] rounded-sm mr-2"></span>
-                        <span>Cold Leads</span>
-                    </div>
-                    <div class="inline-flex items-center">
-                        <span class="w-4 h-4 block bg-[#FF931E] rounded-sm mr-2"></span>
-                        <span>Warm Leads</span>
-                    </div>
-                    <div class="inline-flex items-center">
-                        <span class="w-4 h-4 block bg-[#F54A45] rounded-sm mr-2"></span>
-                        <span>Hot Leads</span>
-                    </div>
-                </div>
+                <canvas id="donut-chart" class="w-full h-10"></canvas>
             </div>
         </div>
     </div>
@@ -156,13 +122,13 @@
                         <td class="px-4 py-2 text-sm text-[#1D2939]">{{ $contact->location }}</td>
                         <td class="px-4 py-2 text-sm">
                             <span
-                            class="inline-block px-[5px] py-[5px] rounded text-white whitespace-nowrap w-[100px] text-center {{ $contact->lead_status == 'Hot Leads'
-                                ? 'bg-[#F54A45]'
-                                : ($contact->lead_status == 'Warm Leads'
-                                    ? 'bg-[#FF931E]'
-                                    : 'bg-[#0549CF]') }}">
-                            {{ $contact->lead_status }}
-                        </span>
+                                class="inline-block px-[5px] py-[5px] rounded text-white whitespace-nowrap w-[100px] text-center {{ $contact->lead_status == 'Hot Leads'
+                                    ? 'bg-[#F54A45]'
+                                    : ($contact->lead_status == 'Warm Leads'
+                                        ? 'bg-[#FF931E]'
+                                        : 'bg-[#0549CF]') }}">
+                                {{ $contact->lead_status }}
+                            </span>
 
                         </td>
                     </tr>

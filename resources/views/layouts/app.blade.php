@@ -48,6 +48,8 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <!-- Lodash Library -->
     <script src="./node_modules/lodash/lodash.min.js"></script>
 
@@ -204,6 +206,70 @@
 
         document.addEventListener('DOMContentLoaded', fetchContacts);
     </script> --}}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const stackedBarChartCtx = document.getElementById('stacked-bar-chart').getContext('2d');
+            const donutChartCtx = document.getElementById('donut-chart').getContext('2d');
+
+            // Data dari server
+            const hotLeads = {{ $hotLeads }};
+            const warmLeads = {{ $warmLeads }};
+            const coldLeads = {{ $coldLeads }};
+            const totalLeads = {{ $totalLeads }};
+
+            // Stacked Bar Chart
+            const stackedBarChart = new Chart(stackedBarChartCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Leads'],
+                    datasets: [{
+                            label: 'Cold Leads',
+                            data: [coldLeads],
+                            backgroundColor: '#0549CF',
+                        },
+                        {
+                            label: 'Warm Leads',
+                            data: [warmLeads],
+                            backgroundColor: '#FF931E',
+                        },
+                        {
+                            label: 'Hot Leads',
+                            data: [hotLeads],
+                            backgroundColor: '#F54A45',
+                        },
+                    ],
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Donut Chart
+            const donutChart = new Chart(donutChartCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Cold Leads', 'Warm Leads', 'Hot Leads'],
+                    datasets: [{
+                        data: [coldLeads, warmLeads, hotLeads],
+                        backgroundColor: ['#0549CF', '#FF931E', '#F54A45'],
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 
 </body>
 

@@ -10,6 +10,11 @@ class LeadUpdate extends Model
         'contact_id',
         'admin_id',
         'status',
+        'update_status',
+        'follow_up_date',
+        'notes',
+        'pic_assigned',
+
     ];
 
     public function contact()
