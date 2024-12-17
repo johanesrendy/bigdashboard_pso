@@ -16,6 +16,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.workflow_run.conclusion == 'success'
     steps:
+      - name: 📥 Download Run Number Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: run-number
+
+      - name: 🔍 Read Run Number
+        id: run_number
+        run: echo "RUN_NUMBER=$(cat run_number.txt)" >> $GITHUB_ENV
       - name: 🛎 Checkout Production Code
         uses: actions/checkout@v3
         with:
@@ -24,9 +32,9 @@ jobs:
       - name: 🚀 Pull Latest Docker Images
         run: |
           echo "=== Pulling Latest Docker Images ==="
-          TAG=${{ github.run_number }}
+          TAG=${{ env.RUN_NUMBER }}
           echo "Using Image Tag: $TAG"
-          
+
           # Validate Docker Images
           if ! sudo docker manifest inspect johanesrendy/laravel:$TAG > /dev/null; then
             echo "Error: Docker image johanesrendy/laravel:$TAG not found!"

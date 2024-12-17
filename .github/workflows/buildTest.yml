@@ -52,6 +52,15 @@ jobs:
           push: true
           tags: johanesrendy/laravel-npm:${{ github.run_number }}
 
+      - name: 📤 Save Run Number as Artifact
+        run: echo "${{ github.run_number }}" > run_number.txt
+
+      - name: 📦 Upload Run Number Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: run-number
+          path: run_number.txt
+
   quality-gate-check:
     name: ✅ SonarCloud Quality Gate Check
     needs: build-and-push
