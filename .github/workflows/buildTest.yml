@@ -34,7 +34,7 @@ jobs:
           context: .
           file: ./Docker/dockerfile/app.Dockerfile
           push: true
-          tags: johanesrendy/laravel:${{ github.run_number }}
+          tags: johanesrendy/laravel:50
 
       - name: 📦 Build and Push Nginx Image
         uses: docker/build-push-action@v6
@@ -42,7 +42,7 @@ jobs:
           context: .
           file: ./Docker/dockerfile/nginx.Dockerfile
           push: true
-          tags: johanesrendy/laravel-nginx:${{ github.run_number }}
+          tags: johanesrendy/laravel-nginx:50
 
       - name: 📦 Build and Push NPM Image
         uses: docker/build-push-action@v6
@@ -50,7 +50,7 @@ jobs:
           context: .
           file: ./Docker/dockerfile/npm.Dockerfile
           push: true
-          tags: johanesrendy/laravel-npm:${{ github.run_number }}
+          tags: johanesrendy/laravel-npm:50
 
   quality-gate-check:
     name: ✅ SonarCloud Quality Gate Check
@@ -90,16 +90,16 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: dev
           branch: production
-          title: "Deploy Dev to Production - Build #${{ github.run_number }}"
+          title: "Deploy Dev to Production - Build #50"
           body: |
             ### 🚀 Deployment PR
             Merging updates from dev to production.
-            - *Build Number*: #${{ github.run_number }}
+            - *Build Number*: #50
             - *Pipeline Status*: ✅ Quality Gate Passed
             - *Docker Images Pushed*:
-              - App: johanesrendy/laravel:${{ github.run_number }}
-              - Nginx: johanesrendy/laravel-nginx:${{ github.run_number }}
-              - NPM: johanesrendy/laravel-npm:${{ github.run_number }}
+              - App: johanesrendy/laravel:50
+              - Nginx: johanesrendy/laravel-nginx:50
+              - NPM: johanesrendy/laravel-npm:50
 
       - name: 🔍 Debug Pull Request
         run: |
