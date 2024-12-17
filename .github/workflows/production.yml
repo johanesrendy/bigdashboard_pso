@@ -34,6 +34,7 @@ jobs:
             cd ~/bigdashboard_pso
             git checkout production
             git pull origin production
+            composer install
 
             echo "=== Deleting hot ==="
             cd public
@@ -49,8 +50,7 @@ jobs:
             sudo nginx -t
             sudo service nginx restart
 
-            echo "=== Rebuilding Docker Containers ==="
-            composer install
+            echo "=== Rebuilding Docker Containers ===
             sudo docker-compose --env-file .env down
             sudo docker-compose --env-file .env up -d --build
 
