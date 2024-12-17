@@ -20,6 +20,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: run-number
+          path: run_number.txt
 
       - name: 🔍 Read Run Number
         id: run_number
